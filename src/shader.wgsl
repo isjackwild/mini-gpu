@@ -1,8 +1,9 @@
 struct Uniforms {
-  u_color : vec4<f32>,
+  u_elapsed_time : f32,
+  u_delta_time : f32,
+  u_resolution: vec2<f32>,
 }
-@group(0) @binding(0)
-var<uniform> uniforms : Uniforms;
+@group(0) @binding(0) var<uniform> uniforms : Uniforms;
 
 struct VertexInput {
     @location(0) position : vec4<f32>,
@@ -24,5 +25,5 @@ fn vertex_main(vert : VertexInput) -> VertexOutput {
 
 @fragment
 fn fragment_main(in: VertexOutput) -> @location(0) vec4<f32> {
-  return vec4<f32>(in.color);
+  return vec4<f32>(1,cos(uniforms.u_elapsed_time) / 2 + 0.5,0,1);
 }

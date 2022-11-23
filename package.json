@@ -8,9 +8,11 @@
   "devDependencies": {
     "@parcel/transformer-glsl": "^2.3.2",
     "@parcel/transformer-inline-string": "^2.3.2",
+    "@webgpu/types": "^0.1.21",
     "parcel": "^2.3.2"
   },
   "dependencies": {
-    "@webgpu/types": "^0.1.21"
+    "gl-matrix": "^3.4.3",
+    "twgl.js": "^5.2.0"
   }
 }
