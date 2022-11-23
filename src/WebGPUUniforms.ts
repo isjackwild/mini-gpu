@@ -25,7 +25,7 @@ class WebGPUUniforms {
       }
     }
 
-    this.createArraysAndBuffers(this.bufferMembers, this.textures);
+    this.createArraysAndBuffers();
     this.createBindGroup();
 
     const handler = {
@@ -39,41 +39,76 @@ class WebGPUUniforms {
     this._uniform = new Proxy({}, handler);
   }
 
-  private createBindGroup() {
-    this._bindGroupLayout = this.device.createBindGroupLayout({
-      entries: [
-        {
-          binding: 0,
-          visibility:
-            GPUShaderStage.VERTEX |
-            GPUShaderStage.FRAGMENT |
-            GPUShaderStage.COMPUTE,
-          buffer: { type: "uniform" },
+  private createBindGroup(): void {
+    const entriesLayout: GPUBindGroupLayoutEntry[] = [];
+    entriesLayout.push({
+      binding: entriesLayout.length,
+      visibility:
+        GPUShaderStage.VERTEX |
+        GPUShaderStage.FRAGMENT |
+        GPUShaderStage.COMPUTE,
+      buffer: { type: "uniform" },
+    });
+
+    this.textures.forEach(({ value }) => {
+      entriesLayout.push({
+        binding: entriesLayout.length,
+        visibility:
+          GPUShaderStage.VERTEX |
+          GPUShaderStage.FRAGMENT |
+          GPUShaderStage.COMPUTE,
+        sampler: { type: "filtering" },
+      });
+      entriesLayout.push({
+        binding: entriesLayout.length,
+        visibility:
+          GPUShaderStage.VERTEX |
+          GPUShaderStage.FRAGMENT |
+          GPUShaderStage.COMPUTE,
+        texture: {
+          sampleType: "float",
+          multisampled: false,
+          viewDimension: value.dimension,
         },
-      ],
+      });
+    });
+
+    this._bindGroupLayout = this.device.createBindGroupLayout({
+      entries: entriesLayout,
+    });
+
+    const entries: GPUBindGroupEntry[] = [];
+    entries.push({
+      binding: 0,
+      resource: {
+        buffer: this.uniformsBuffer,
+      },
+    });
+    this.textures.forEach(({ value }) => {
+      entries.push({
+        binding: entries.length,
+        resource: this.device.createSampler({
+          magFilter: "linear",
+          minFilter: "linear",
+        }),
+      });
+      entries.push({
+        binding: entries.length,
+        resource: value.createView({ dimension: value.dimension }),
+      });
     });
 
     this._bindGroup = this.device.createBindGroup({
       layout: this.bindGroupLayout,
-      entries: [
-        {
-          binding: 0,
-          resource: {
-            buffer: this.uniformsBuffer,
-          },
-        },
-      ],
+      entries,
     });
   }
 
-  private createArraysAndBuffers(
-    bufferMembers: { key: string; value: any }[],
-    textures: { key: string; value: GPUTexture }[]
-  ) {
+  private createArraysAndBuffers(): void {
     const arrayData: number[] = [];
 
-    // TODO, array padding;
-    for (let { key, value } of bufferMembers) {
+    // TODO, array padding and alignment;
+    for (let { key, value } of this.bufferMembers) {
       const arrayIndex = arrayData.length;
       this.uniformsArrayMemberMetadata[key] = {
         index: arrayIndex,
@@ -87,7 +122,6 @@ class WebGPUUniforms {
       }
     }
 
-    console.log(arrayData.length * Float32Array.BYTES_PER_ELEMENT);
     this.uniformsBuffer = this.device.createBuffer({
       size: arrayData.length * Float32Array.BYTES_PER_ELEMENT,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,

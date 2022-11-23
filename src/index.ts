@@ -1,11 +1,13 @@
 import { mat4, mat3, quat, vec4, vec2, vec3 } from "gl-matrix";
 import { primitives } from "twgl.js";
+import textureSrc from "./spectral-interference.png";
 import shader from "bundle-text:./shader.wgsl";
 import WebGPURenderer from "./WebGPURenderer";
 import WebGPUMesh from "./WebGPUMesh";
 import WebGPUProgram from "./WebGPUProgram";
 import WebGPUUniforms from "./WebGPUUniforms";
 import WebGPUGeometry, { TGeometryArgs } from "./WebGPUGeometry";
+import TextureLoader from "./TextureLoader";
 
 let device: GPUDevice;
 const canvas = document.querySelector("canvas") as HTMLCanvasElement;
@@ -40,6 +42,9 @@ const init = async () => {
     );
   }
   const device = (await requestWebGPU()) as GPUDevice;
+  const texture = await new TextureLoader(device).loadTextureFromImageSrc(
+    textureSrc
+  );
   renderer = new WebGPURenderer(device as GPUDevice, canvas);
 
   const geometry = new WebGPUGeometry(
@@ -49,12 +54,11 @@ const init = async () => {
   uniforms = new WebGPUUniforms(device as GPUDevice, {
     u_elapsed_time: 0,
     u_delta_time: 0,
+    u_texture: texture,
   });
-
   const uniforms2 = new WebGPUUniforms(device as GPUDevice, {
     u_resolution: [canvas.width, canvas.height],
   });
-
   const program = new WebGPUProgram(renderer, shader, {
     default: uniforms,
     viewport: uniforms2,

@@ -521,6 +521,8 @@ function hmrAcceptRun(bundle, id) {
 },{}],"h7u1C":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 var _twglJs = require("twgl.js");
+var _spectralInterferencePng = require("./spectral-interference.png");
+var _spectralInterferencePngDefault = parcelHelpers.interopDefault(_spectralInterferencePng);
 var _shaderWgsl = require("bundle-text:./shader.wgsl");
 var _shaderWgslDefault = parcelHelpers.interopDefault(_shaderWgsl);
 var _webGPURenderer = require("./WebGPURenderer");
@@ -533,6 +535,8 @@ var _webGPUUniforms = require("./WebGPUUniforms");
 var _webGPUUniformsDefault = parcelHelpers.interopDefault(_webGPUUniforms);
 var _webGPUGeometry = require("./WebGPUGeometry");
 var _webGPUGeometryDefault = parcelHelpers.interopDefault(_webGPUGeometry);
+var _textureLoader = require("./TextureLoader");
+var _textureLoaderDefault = parcelHelpers.interopDefault(_textureLoader);
 let device;
 const canvas = document.querySelector("canvas");
 canvas.width = window.innerWidth * window.devicePixelRatio;
@@ -557,11 +561,13 @@ const render = ()=>{
 const init = async ()=>{
     if (!navigator.gpu) return alert("WebGPU not available! — Use Chrome Canary and enable-unsafe-gpu in flags.");
     const device1 = await requestWebGPU();
+    const texture = await new _textureLoaderDefault.default(device1).loadTextureFromImageSrc(_spectralInterferencePngDefault.default);
     renderer = new _webGPURendererDefault.default(device1, canvas);
     const geometry = new _webGPUGeometryDefault.default(renderer, _twglJs.primitives.createSphereVertices(1, 64, 32));
     uniforms = new _webGPUUniformsDefault.default(device1, {
         u_elapsed_time: 0,
-        u_delta_time: 0
+        u_delta_time: 0,
+        u_texture: texture
     });
     const uniforms2 = new _webGPUUniformsDefault.default(device1, {
         u_resolution: [
@@ -580,7 +586,7 @@ const init = async ()=>{
 };
 init();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./WebGPURenderer":"4h10T","twgl.js":"fnVqF","./WebGPUMesh":"6EJps","bundle-text:./shader.wgsl":"ac8tN","./WebGPUProgram":"4zqA9","./WebGPUUniforms":"jqghB","./WebGPUGeometry":"9XV6A"}],"gkKU3":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./WebGPURenderer":"4h10T","twgl.js":"fnVqF","./WebGPUMesh":"6EJps","bundle-text:./shader.wgsl":"ac8tN","./WebGPUProgram":"4zqA9","./WebGPUUniforms":"jqghB","./WebGPUGeometry":"9XV6A","./spectral-interference.png":"elDNp","./TextureLoader":"91odF"}],"gkKU3":[function(require,module,exports) {
 exports.interopDefault = function(a) {
     return a && a.__esModule ? a : {
         default: a
@@ -11048,7 +11054,7 @@ class WebGPUMesh {
 exports.default = WebGPUMesh;
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ac8tN":[function(require,module,exports) {
-module.exports = "struct Uniforms {\n  u_elapsed_time : f32,\n  u_delta_time : f32,\n  u_resolution: vec2<f32>,\n}\n@group(0) @binding(0) var<uniform> uniforms : Uniforms;\n\nstruct VertexInput {\n    @location(0) position : vec4<f32>,\n    @location(1) color : vec4<f32>,\n}\n\nstruct VertexOutput {\n  @builtin(position) position : vec4<f32>,\n  @location(0) color : vec4<f32>,\n}\n\n@vertex\nfn vertex_main(vert : VertexInput) -> VertexOutput {\n  var output : VertexOutput;\n  output.position = vert.position;\n  output.color = vert.color;\n  return output;\n}\n\n@fragment\nfn fragment_main(in: VertexOutput) -> @location(0) vec4<f32> {\n  return vec4<f32>(1,cos(uniforms.u_elapsed_time) / 2 + 0.5,0,1);\n}";
+module.exports = "struct UniformsDefault {\n  u_elapsed_time : f32,\n  u_delta_time : f32,\n}\n\n@group(0) @binding(0) var<uniform> uniforms_default : UniformsDefault;\n     \nstruct UniformsViewport {\n  u_resolution : vec2<f32>,\n}\n\n@group(1) @binding(0) var<uniform> uniforms_viewport : UniformsViewport;\n\nstruct VertexInput {\n    @location(0) position : vec4<f32>,\n    @location(1) color : vec4<f32>,\n}\n\nstruct VertexOutput {\n  @builtin(position) position : vec4<f32>,\n  @location(0) color : vec4<f32>,\n}\n\n@vertex\nfn vertex_main(vert : VertexInput) -> VertexOutput {\n  var output : VertexOutput;\n  output.position = vert.position;\n  output.color = vert.color;\n  return output;\n}\n\n@fragment\nfn fragment_main(in: VertexOutput) -> @location(0) vec4<f32> {\n  return vec4<f32>(1,cos(uniforms_default.u_elapsed_time) / 2 + 0.5,0,1);\n} ";
 
 },{}],"4zqA9":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -11122,7 +11128,7 @@ class WebGPUUniforms {
                 value
             });
         }
-        this.createArraysAndBuffers(this.bufferMembers, this.textures);
+        this.createArraysAndBuffers();
         this.createBindGroup();
         const handler = {
             get: (target, prop)=>{
@@ -11136,33 +11142,66 @@ class WebGPUUniforms {
         }, handler);
     }
     createBindGroup() {
+        const entriesLayout = [];
+        entriesLayout.push({
+            binding: entriesLayout.length,
+            visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE,
+            buffer: {
+                type: "uniform"
+            }
+        });
+        this.textures.forEach(({ value  })=>{
+            entriesLayout.push({
+                binding: entriesLayout.length,
+                visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE,
+                sampler: {
+                    type: "filtering"
+                }
+            });
+            entriesLayout.push({
+                binding: entriesLayout.length,
+                visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE,
+                texture: {
+                    sampleType: "float",
+                    multisampled: false,
+                    viewDimension: value.dimension
+                }
+            });
+        });
         this._bindGroupLayout = this.device.createBindGroupLayout({
-            entries: [
-                {
-                    binding: 0,
-                    visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE,
-                    buffer: {
-                        type: "uniform"
-                    }
-                }, 
-            ]
+            entries: entriesLayout
+        });
+        const entries = [];
+        entries.push({
+            binding: 0,
+            resource: {
+                buffer: this.uniformsBuffer
+            }
+        });
+        this.textures.forEach(({ value  })=>{
+            entries.push({
+                binding: entries.length,
+                resource: this.device.createSampler({
+                    magFilter: "linear",
+                    minFilter: "linear"
+                })
+            });
+            entries.push({
+                binding: entries.length,
+                resource: value.createView({
+                    dimension: value.dimension
+                })
+            });
         });
         this._bindGroup = this.device.createBindGroup({
             layout: this.bindGroupLayout,
-            entries: [
-                {
-                    binding: 0,
-                    resource: {
-                        buffer: this.uniformsBuffer
-                    }
-                }, 
-            ]
+            entries
         });
     }
-    createArraysAndBuffers(bufferMembers, textures) {
+    createArraysAndBuffers() {
         const arrayData = [];
-        // TODO, array padding;
-        for (let { key , value  } of bufferMembers){
+        // TODO, array padding and alignment;
+        for (let { key , value  } of this.bufferMembers){
             const arrayIndex = arrayData.length;
             this.uniformsArrayMemberMetadata[key] = {
                 index: arrayIndex,
@@ -11171,7 +11210,6 @@ class WebGPUUniforms {
             if (Array.isArray(value)) arrayData.push(...value);
             else arrayData.push(value);
         }
-        console.log(arrayData.length * Float32Array.BYTES_PER_ELEMENT);
         this.uniformsBuffer = this.device.createBuffer({
             size: arrayData.length * Float32Array.BYTES_PER_ELEMENT,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
@@ -11317,6 +11355,111 @@ class WebGPUGeometry {
     }
 }
 exports.default = WebGPUGeometry;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"elDNp":[function(require,module,exports) {
+module.exports = require('./helpers/bundle-url').getBundleURL('7UhFu') + "spectral-interference.c93846d7.png" + "?" + Date.now();
+
+},{"./helpers/bundle-url":"lgJ39"}],"lgJ39":[function(require,module,exports) {
+"use strict";
+var bundleURL = {
+};
+function getBundleURLCached(id) {
+    var value = bundleURL[id];
+    if (!value) {
+        value = getBundleURL();
+        bundleURL[id] = value;
+    }
+    return value;
+}
+function getBundleURL() {
+    try {
+        throw new Error();
+    } catch (err) {
+        var matches = ('' + err.stack).match(/(https?|file|ftp):\/\/[^)\n]+/g);
+        if (matches) // The first two stack frames will be this function and getBundleURLCached.
+        // Use the 3rd one, which will be a runtime in the original bundle.
+        return getBaseURL(matches[2]);
+    }
+    return '/';
+}
+function getBaseURL(url) {
+    return ('' + url).replace(/^((?:https?|file|ftp):\/\/.+)\/[^/]+$/, '$1') + '/';
+} // TODO: Replace uses with `new URL(url).origin` when ie11 is no longer supported.
+function getOrigin(url) {
+    var matches = ('' + url).match(/(https?|file|ftp):\/\/[^/]+/);
+    if (!matches) throw new Error('Origin not found');
+    return matches[0];
+}
+exports.getBundleURL = getBundleURLCached;
+exports.getBaseURL = getBaseURL;
+exports.getOrigin = getOrigin;
+
+},{}],"91odF":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+class TextureLoader {
+    constructor(device){
+        this.device = device;
+    }
+    createTextureFromImageBitmapOrCanvas(src) {
+        const isCubemap = Array.isArray(src);
+        const width = isCubemap ? src[0].width : src.width;
+        const height = isCubemap ? src[0].height : src.height;
+        const depth = isCubemap ? 6 : 1;
+        const texture = this.device.createTexture({
+            dimension: "2d",
+            size: [
+                width,
+                height,
+                depth
+            ],
+            format: "rgba8unorm",
+            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT
+        });
+        if (isCubemap) src.forEach((faceSrc, i)=>{
+            this.device.queue.copyExternalImageToTexture({
+                source: faceSrc
+            }, {
+                texture,
+                origin: [
+                    0,
+                    0,
+                    i
+                ]
+            }, [
+                faceSrc.width,
+                faceSrc.height
+            ]);
+        });
+        else this.device.queue.copyExternalImageToTexture({
+            source: src
+        }, {
+            texture
+        }, [
+            src.width,
+            src.height
+        ]);
+        return texture;
+    }
+    async loadImageBitmapFromImageSrc(src) {
+        const response = await fetch(src);
+        const blob = await response.blob();
+        const imageBitmap = await createImageBitmap(blob);
+        return imageBitmap;
+    }
+    async loadTextureFromImageSrc(src1) {
+        if (Array.isArray(src1)) {
+            const promises = src1.map(async (src)=>await this.loadImageBitmapFromImageSrc(src)
+            );
+            const imageBitmaps = await Promise.all(promises);
+            return this.createTextureFromImageBitmapOrCanvas(imageBitmaps);
+        } else {
+            const imageBitmap = await this.loadImageBitmapFromImageSrc(src1);
+            return this.createTextureFromImageBitmapOrCanvas(imageBitmap);
+        }
+    }
+}
+exports.default = TextureLoader;
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["8wcER","h7u1C"], "h7u1C", "parcelRequire94c2")
 
