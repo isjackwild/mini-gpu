@@ -1,12 +1,15 @@
-import { WebGPUUniforms } from "./WebGPUMesh";
 import WebGPURenderer from "./WebGPURenderer";
+import WebGPUUniforms from "./WebGPUUniforms";
 
 class WebGPUProgram {
+  private uniformsKeys: string[];
   constructor(
     renderer: WebGPURenderer,
     public shader: string,
     public uniforms: { [key: string]: WebGPUUniforms }
-  ) {}
+  ) {
+    this.uniformsKeys = Object.keys(uniforms);
+  }
 
   public getFragmentState(
     renderer: WebGPURenderer,
@@ -36,15 +39,22 @@ class WebGPUProgram {
   }
 
   public getBindGroupLayouts(): GPUBindGroupLayout[] {
-    return Object.keys(this.uniforms).map(
-      (key) => this.uniforms[key].bindGroupLayout
-    );
+    return this.uniformsKeys.map((key) => this.uniforms[key].bindGroupLayout);
   }
 
   public setBindGroups(renderPass: GPURenderPassEncoder): void {
-    Object.keys(this.uniforms).forEach((key, index) => {
+    this.uniformsKeys.forEach((key, index) => {
       renderPass.setBindGroup(index, this.uniforms[key].bindGroup);
     });
+  }
+
+  public getWgslChunk(): string {
+    return this.uniformsKeys.reduce((acc, key) => {
+      return `${acc} ${this.uniforms[key].getWgslChunk(
+        this.uniformsKeys.indexOf(key),
+        key
+      )}`;
+    }, "");
   }
 }
 

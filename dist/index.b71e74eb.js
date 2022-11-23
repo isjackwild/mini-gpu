@@ -561,16 +561,19 @@ const init = async ()=>{
     const geometry = new _webGPUGeometryDefault.default(renderer, _twglJs.primitives.createSphereVertices(1, 64, 32));
     uniforms = new _webGPUUniformsDefault.default(device1, {
         u_elapsed_time: 0,
-        u_delta_time: 0,
+        u_delta_time: 0
+    });
+    const uniforms2 = new _webGPUUniformsDefault.default(device1, {
         u_resolution: [
             canvas.width,
             canvas.height
         ]
     });
-    uniforms.uniform.u_elapsed_time = 0.01;
     const program = new _webGPUProgramDefault.default(renderer, _shaderWgslDefault.default, {
-        default: uniforms
+        default: uniforms,
+        viewport: uniforms2
     });
+    console.log(program.getWgslChunk());
     const mesh = new _webGPUMeshDefault.default(renderer, geometry, program);
     renderer.addRenderable(mesh);
     requestAnimationFrame(render);
@@ -11054,6 +11057,7 @@ class WebGPUProgram {
     constructor(renderer, shader, uniforms){
         this.shader = shader;
         this.uniforms = uniforms;
+        this.uniformsKeys = Object.keys(uniforms);
     }
     getFragmentState(renderer, shaderModule) {
         return {
@@ -11079,13 +11083,18 @@ class WebGPUProgram {
         };
     }
     getBindGroupLayouts() {
-        return Object.keys(this.uniforms).map((key)=>this.uniforms[key].bindGroupLayout
+        return this.uniformsKeys.map((key)=>this.uniforms[key].bindGroupLayout
         );
     }
     setBindGroups(renderPass) {
-        Object.keys(this.uniforms).forEach((key, index)=>{
+        this.uniformsKeys.forEach((key, index)=>{
             renderPass.setBindGroup(index, this.uniforms[key].bindGroup);
         });
+    }
+    getWgslChunk() {
+        return this.uniformsKeys.reduce((acc, key)=>{
+            return `${acc} ${this.uniforms[key].getWgslChunk(this.uniformsKeys.indexOf(key), key)}`;
+        }, "");
     }
 }
 exports.default = WebGPUProgram;
@@ -11096,24 +11105,24 @@ parcelHelpers.defineInteropFlag(exports);
 class WebGPUUniforms {
     constructor(device, members){
         this.device = device;
+        this.bufferMembers = [];
+        this.textures = [];
         this.uniformsArrayMemberMetadata = {
         };
         this.bufferNeedsUpdate = true;
         this.autoUpdate = true;
-        const bufferMembers = [];
-        const textures = [];
         for(let key in members){
             const value = members[key];
-            if (value instanceof GPUTexture) textures.push({
+            if (value instanceof GPUTexture) this.textures.push({
                 key,
                 value
             });
-            else bufferMembers.push({
+            else this.bufferMembers.push({
                 key,
                 value
             });
         }
-        this.createArraysAndBuffers(bufferMembers, textures);
+        this.createArraysAndBuffers(this.bufferMembers, this.textures);
         this.createBindGroup();
         const handler = {
             get: (target, prop)=>{
@@ -11193,6 +11202,22 @@ class WebGPUUniforms {
     }
     get bindGroup() {
         return this._bindGroup;
+    }
+    getWgslChunk(groupIndex = "[REPLACE_WITH_GROUP]", uniformsName = "") {
+        const structName = `Uniforms${uniformsName.charAt(0).toUpperCase() + uniformsName.slice(1)}`;
+        return `
+    ${structName} {
+        ${this.bufferMembers.reduce((acc, { key , value  })=>{
+            console.log(value);
+            const type = Array.isArray(value) ? `vec${value.length}<f32>` : "f32";
+            if (acc === "") return `${key} : ${type},`;
+            else return `${acc}
+        ${key} : ${type},`;
+        }, "")}
+    }
+
+    @group(${groupIndex}) @binding(0) var<uniform> uniforms${uniformsName ? "_" : ""}${uniformsName} : ${structName};
+    `;
     }
     update() {
         if (!this.bufferNeedsUpdate) return;

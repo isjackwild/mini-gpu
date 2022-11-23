@@ -46,16 +46,20 @@ const init = async () => {
     renderer,
     primitives.createSphereVertices(1, 64, 32) as TGeometryArgs
   );
-
   uniforms = new WebGPUUniforms(device as GPUDevice, {
     u_elapsed_time: 0,
     u_delta_time: 0,
+  });
+
+  const uniforms2 = new WebGPUUniforms(device as GPUDevice, {
     u_resolution: [canvas.width, canvas.height],
   });
 
-  uniforms.uniform.u_elapsed_time = 0.01;
-
-  const program = new WebGPUProgram(renderer, shader, { default: uniforms });
+  const program = new WebGPUProgram(renderer, shader, {
+    default: uniforms,
+    viewport: uniforms2,
+  });
+  console.log(program.getWgslChunk());
 
   const mesh = new WebGPUMesh(renderer, geometry, program);
   renderer.addRenderable(mesh);

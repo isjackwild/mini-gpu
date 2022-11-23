@@ -1,5 +1,9 @@
 class WebGPUUniforms {
   private _uniform: ProxyConstructor;
+
+  private bufferMembers: { key: string; value: any }[] = [];
+  private textures: { key: string; value: GPUTexture }[] = [];
+
   private uniformsArray: Float32Array;
   private uniformsArrayMemberMetadata: {
     [key: string]: { index: number; length: number };
@@ -11,19 +15,17 @@ class WebGPUUniforms {
   public autoUpdate = true;
 
   constructor(private device: GPUDevice, members: { [key: string]: any }) {
-    const bufferMembers: { key: string; value: any }[] = [];
-    const textures: { key: string; value: GPUTexture }[] = [];
     for (let key in members) {
       const value = members[key];
 
       if (value instanceof GPUTexture) {
-        textures.push({ key, value });
+        this.textures.push({ key, value });
       } else {
-        bufferMembers.push({ key, value });
+        this.bufferMembers.push({ key, value });
       }
     }
 
-    this.createArraysAndBuffers(bufferMembers, textures);
+    this.createArraysAndBuffers(this.bufferMembers, this.textures);
     this.createBindGroup();
 
     const handler = {
@@ -129,6 +131,33 @@ class WebGPUUniforms {
 
   public get bindGroup(): GPUBindGroup {
     return this._bindGroup;
+  }
+
+  public getWgslChunk(
+    groupIndex: string | number = "[REPLACE_WITH_GROUP]",
+    uniformsName: string = ""
+  ): string {
+    const structName = `Uniforms${
+      uniformsName.charAt(0).toUpperCase() + uniformsName.slice(1)
+    }`;
+    return `
+    ${structName} {
+        ${this.bufferMembers.reduce((acc, { key, value }) => {
+          console.log(value);
+          const type = Array.isArray(value) ? `vec${value.length}<f32>` : "f32";
+          if (acc === "") {
+            return `${key} : ${type},`;
+          } else {
+            return `${acc}
+        ${key} : ${type},`;
+          }
+        }, "")}
+    }
+
+    @group(${groupIndex}) @binding(0) var<uniform> uniforms${
+      uniformsName ? "_" : ""
+    }${uniformsName} : ${structName};
+    `;
   }
 
   public update() {
