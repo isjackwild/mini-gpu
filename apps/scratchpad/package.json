@@ -1,0 +1,18 @@
+{
+  "source": "src/index.html",
+  "browserslist": "> 0.5%, last 2 versions, not dead",
+  "scripts": {
+    "start": "parcel --no-cache",
+    "build": "parcel build"
+  },
+  "devDependencies": {
+    "@parcel/transformer-glsl": "^2.3.2",
+    "@parcel/transformer-inline-string": "^2.3.2",
+    "@webgpu/types": "^0.1.21",
+    "parcel": "^2.3.2"
+  },
+  "dependencies": {
+    "gl-matrix": "^3.4.3",
+    "twgl.js": "^5.2.0"
+  }
+}
