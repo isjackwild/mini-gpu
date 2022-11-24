@@ -31,6 +31,10 @@ class Mesh implements RenderableInterface {
     });
   }
 
+  public static get foo(): string {
+    return "bar";
+  }
+
   public getCommands(renderPass: GPURenderPassEncoder): void {
     renderPass.setPipeline(this.pipeline);
     this.geometry.setVertexBuffers(renderPass);
