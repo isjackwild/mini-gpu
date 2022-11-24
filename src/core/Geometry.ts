@@ -1,4 +1,4 @@
-import WebGPURenderer from "./WebGPURenderer";
+import Renderer from "./Renderer";
 
 export type TGeometryArgs = {
   indices: Uint16Array;
@@ -7,7 +7,7 @@ export type TGeometryArgs = {
   texcoord: Float32Array;
 };
 
-class WebGPUGeometry {
+class Geometry {
   private _vertexCount: number;
   private _instanceCount: number;
 
@@ -17,7 +17,7 @@ class WebGPUGeometry {
   private texCoordBuffer: GPUBuffer;
 
   constructor(
-    renderer: WebGPURenderer,
+    renderer: Renderer,
     { indices, normal, position, texcoord }: TGeometryArgs
   ) {
     this._vertexCount = indices.length;
@@ -113,4 +113,4 @@ class WebGPUGeometry {
   }
 }
 
-export default WebGPUGeometry;
+export default Geometry;

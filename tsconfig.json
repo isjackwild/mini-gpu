@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "types": ["@webgpu/types"],
+    "lib": ["es2017", "DOM"],
+    "target": "es2017",
+    "typeRoots": ["./node_modules/@types", "./node_modules/@webgpu"]
+  }
+}

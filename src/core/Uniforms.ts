@@ -1,4 +1,4 @@
-class WebGPUUniforms {
+class Uniforms {
   private _uniform: ProxyConstructor;
 
   private bufferMembers: { key: string; value: any }[] = [];
@@ -227,4 +227,4 @@ class WebGPUUniforms {
   }
 }
 
-export default WebGPUUniforms;
+export default Uniforms;

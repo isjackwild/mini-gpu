@@ -2,7 +2,7 @@ export interface RenderableInterface {
   getCommands(renderPassDescriptor: GPURenderPassEncoder): void;
 }
 
-class WebGPURenderer {
+class Renderer {
   public ctx: GPUCanvasContext;
   private renderables: Set<RenderableInterface> = new Set();
   public presentationFormat: GPUTextureFormat;
@@ -92,4 +92,4 @@ class WebGPURenderer {
   }
 }
 
-export default WebGPURenderer;
+export default Renderer;

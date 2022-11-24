@@ -1,13 +1,13 @@
-import WebGPUGeometry from "./WebGPUGeometry";
-import WebGPUProgram from "./WebGPURenderProgram";
-import WebGPURenderer, { RenderableInterface } from "./WebGPURenderer";
+import Geometry from "./Geometry";
+import RenderProgram from "./RenderProgram";
+import Renderer, { RenderableInterface } from "./Renderer";
 
-class WebGPUMesh implements RenderableInterface {
+class Mesh implements RenderableInterface {
   private pipeline: GPURenderPipeline;
   constructor(
-    renderer: WebGPURenderer,
-    private geometry: WebGPUGeometry,
-    private program: WebGPUProgram
+    renderer: Renderer,
+    private geometry: Geometry,
+    private program: RenderProgram
   ) {
     const shaderModule = renderer.device.createShaderModule({
       code: program.shader,
@@ -44,4 +44,4 @@ class WebGPUMesh implements RenderableInterface {
   }
 }
 
-export default WebGPUMesh;
+export default Mesh;

@@ -1,18 +1,38 @@
 {
-  "source": "src/index.html",
+  "name": "mini-gpu",
+  "version": "0.0.1",
+  "license": "MIT",
+  "homepage": "https://isjackwild.com",
+  "author": "Jack Wild <jack@isjackwild.com> (https://isjackwild.com)",
+  "description": "A mini library for working with WebGPU",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/isjackwild/mini-gpu"
+  },
+  "keywords": [
+    "javascript",
+    "canvas",
+    "webgpu",
+    "wgsl"
+  ],
+  "source": "src/index.ts",
+  "main": "dist/main.js",
+  "module": "dist/module.js",
+  "types": "dist/types.d.ts",
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
-    "start": "parcel",
+    "watch": "parcel watch --no-cache",
     "build": "parcel build"
   },
   "devDependencies": {
-    "@parcel/transformer-glsl": "^2.3.2",
-    "@parcel/transformer-inline-string": "^2.3.2",
+    "@parcel/packager-ts": "^2.8.0",
+    "@parcel/transformer-typescript-types": "^2.8.0",
     "@webgpu/types": "^0.1.21",
-    "parcel": "^2.3.2"
+    "parcel": "^2.3.2",
+    "typescript": "^4.9.3"
   },
   "dependencies": {
-    "gl-matrix": "^3.4.3",
-    "twgl.js": "^5.2.0"
+    "@swc/helpers": "^0.4.14",
+    "gl-matrix": "^3.4.3"
   }
 }

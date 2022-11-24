@@ -1,19 +1,19 @@
-import WebGPURenderer from "./WebGPURenderer";
-import WebGPUUniforms from "./WebGPUUniforms";
+import Renderer from "./Renderer";
+import Uniforms from "./Uniforms";
 
 // TODO — How to update a uniforms group and swap with another
 class WebGPURenderProgram {
   private uniformsKeys: string[];
   constructor(
-    renderer: WebGPURenderer,
+    renderer: Renderer,
     public shader: string,
-    public uniforms: { [key: string]: WebGPUUniforms }
+    public uniforms: { [key: string]: Uniforms }
   ) {
     this.uniformsKeys = Object.keys(this.uniforms);
   }
 
   public getFragmentState(
-    renderer: WebGPURenderer,
+    renderer: Renderer,
     shaderModule: GPUShaderModule
   ): GPUFragmentState {
     return {
