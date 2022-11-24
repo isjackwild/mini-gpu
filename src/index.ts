@@ -4,7 +4,7 @@ import textureSrc from "./spectral-interference.png";
 import shader from "bundle-text:./shader.wgsl";
 import WebGPURenderer from "./WebGPURenderer";
 import WebGPUMesh from "./WebGPUMesh";
-import WebGPUProgram from "./WebGPUProgram";
+import WebGPURenderProgram from "./WebGPURenderProgram";
 import WebGPUUniforms from "./WebGPUUniforms";
 import WebGPUGeometry, { TGeometryArgs } from "./WebGPUGeometry";
 import TextureLoader from "./TextureLoader";
@@ -53,15 +53,18 @@ const init = async () => {
   );
   uniforms = new WebGPUUniforms(device as GPUDevice, {
     u_elapsed_time: 0,
+    u_test_vector: [1, 1, 1],
+    u_test_vector_2: [1, 1, 1, 1],
+    u_test_vector_3: [1, 1],
     u_delta_time: 0,
     u_texture: texture,
   });
-  const uniforms2 = new WebGPUUniforms(device as GPUDevice, {
+  const viewportUniforms = new WebGPUUniforms(device as GPUDevice, {
     u_resolution: [canvas.width, canvas.height],
   });
-  const program = new WebGPUProgram(renderer, shader, {
+  const program = new WebGPURenderProgram(renderer, shader, {
     default: uniforms,
-    viewport: uniforms2,
+    viewport: viewportUniforms,
   });
   console.log(program.getWgslChunk());
 

@@ -1,5 +1,5 @@
 import WebGPUGeometry from "./WebGPUGeometry";
-import WebGPUProgram from "./WebGPUProgram";
+import WebGPUProgram from "./WebGPURenderProgram";
 import WebGPURenderer, { RenderableInterface } from "./WebGPURenderer";
 
 class WebGPUMesh implements RenderableInterface {

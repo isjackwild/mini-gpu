@@ -1,14 +1,15 @@
 import WebGPURenderer from "./WebGPURenderer";
 import WebGPUUniforms from "./WebGPUUniforms";
 
-class WebGPUProgram {
+// TODO — How to update a uniforms group and swap with another
+class WebGPURenderProgram {
   private uniformsKeys: string[];
   constructor(
     renderer: WebGPURenderer,
     public shader: string,
     public uniforms: { [key: string]: WebGPUUniforms }
   ) {
-    this.uniformsKeys = Object.keys(uniforms);
+    this.uniformsKeys = Object.keys(this.uniforms);
   }
 
   public getFragmentState(
@@ -44,6 +45,7 @@ class WebGPUProgram {
 
   public setBindGroups(renderPass: GPURenderPassEncoder): void {
     this.uniformsKeys.forEach((key, index) => {
+      this.uniforms[key].update();
       renderPass.setBindGroup(index, this.uniforms[key].bindGroup);
     });
   }
@@ -58,4 +60,4 @@ class WebGPUProgram {
   }
 }
 
-export default WebGPUProgram;
+export default WebGPURenderProgram;

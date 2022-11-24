@@ -529,8 +529,8 @@ var _webGPURenderer = require("./WebGPURenderer");
 var _webGPURendererDefault = parcelHelpers.interopDefault(_webGPURenderer);
 var _webGPUMesh = require("./WebGPUMesh");
 var _webGPUMeshDefault = parcelHelpers.interopDefault(_webGPUMesh);
-var _webGPUProgram = require("./WebGPUProgram");
-var _webGPUProgramDefault = parcelHelpers.interopDefault(_webGPUProgram);
+var _webGPURenderProgram = require("./WebGPURenderProgram");
+var _webGPURenderProgramDefault = parcelHelpers.interopDefault(_webGPURenderProgram);
 var _webGPUUniforms = require("./WebGPUUniforms");
 var _webGPUUniformsDefault = parcelHelpers.interopDefault(_webGPUUniforms);
 var _webGPUGeometry = require("./WebGPUGeometry");
@@ -566,18 +566,33 @@ const init = async ()=>{
     const geometry = new _webGPUGeometryDefault.default(renderer, _twglJs.primitives.createSphereVertices(1, 64, 32));
     uniforms = new _webGPUUniformsDefault.default(device1, {
         u_elapsed_time: 0,
+        u_test_vector: [
+            1,
+            1,
+            1
+        ],
+        u_test_vector_2: [
+            1,
+            1,
+            1,
+            1
+        ],
+        u_test_vector_3: [
+            1,
+            1
+        ],
         u_delta_time: 0,
         u_texture: texture
     });
-    const uniforms2 = new _webGPUUniformsDefault.default(device1, {
+    const viewportUniforms = new _webGPUUniformsDefault.default(device1, {
         u_resolution: [
             canvas.width,
             canvas.height
         ]
     });
-    const program = new _webGPUProgramDefault.default(renderer, _shaderWgslDefault.default, {
+    const program = new _webGPURenderProgramDefault.default(renderer, _shaderWgslDefault.default, {
         default: uniforms,
-        viewport: uniforms2
+        viewport: viewportUniforms
     });
     console.log(program.getWgslChunk());
     const mesh = new _webGPUMeshDefault.default(renderer, geometry, program);
@@ -586,7 +601,7 @@ const init = async ()=>{
 };
 init();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./WebGPURenderer":"4h10T","twgl.js":"fnVqF","./WebGPUMesh":"6EJps","bundle-text:./shader.wgsl":"ac8tN","./WebGPUProgram":"4zqA9","./WebGPUUniforms":"jqghB","./WebGPUGeometry":"9XV6A","./spectral-interference.png":"elDNp","./TextureLoader":"91odF"}],"gkKU3":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./WebGPURenderer":"4h10T","twgl.js":"fnVqF","./WebGPUMesh":"6EJps","bundle-text:./shader.wgsl":"ac8tN","./WebGPUUniforms":"jqghB","./WebGPUGeometry":"9XV6A","./spectral-interference.png":"elDNp","./TextureLoader":"91odF","./WebGPURenderProgram":"3D4I0"}],"gkKU3":[function(require,module,exports) {
 exports.interopDefault = function(a) {
     return a && a.__esModule ? a : {
         default: a
@@ -11056,56 +11071,7 @@ exports.default = WebGPUMesh;
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ac8tN":[function(require,module,exports) {
 module.exports = "struct UniformsDefault {\n  u_elapsed_time : f32,\n  u_delta_time : f32,\n}\n\n@group(0) @binding(0) var<uniform> uniforms_default : UniformsDefault;\n     \nstruct UniformsViewport {\n  u_resolution : vec2<f32>,\n}\n\n@group(1) @binding(0) var<uniform> uniforms_viewport : UniformsViewport;\n\nstruct VertexInput {\n    @location(0) position : vec4<f32>,\n    @location(1) color : vec4<f32>,\n}\n\nstruct VertexOutput {\n  @builtin(position) position : vec4<f32>,\n  @location(0) color : vec4<f32>,\n}\n\n@vertex\nfn vertex_main(vert : VertexInput) -> VertexOutput {\n  var output : VertexOutput;\n  output.position = vert.position;\n  output.color = vert.color;\n  return output;\n}\n\n@fragment\nfn fragment_main(in: VertexOutput) -> @location(0) vec4<f32> {\n  return vec4<f32>(1,cos(uniforms_default.u_elapsed_time) / 2 + 0.5,0,1);\n} ";
 
-},{}],"4zqA9":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-class WebGPUProgram {
-    constructor(renderer, shader, uniforms){
-        this.shader = shader;
-        this.uniforms = uniforms;
-        this.uniformsKeys = Object.keys(uniforms);
-    }
-    getFragmentState(renderer, shaderModule) {
-        return {
-            module: shaderModule,
-            entryPoint: "fragment_main",
-            targets: [
-                {
-                    format: renderer.presentationFormat,
-                    blend: {
-                        color: {
-                            srcFactor: "src-alpha",
-                            dstFactor: "one-minus-src-alpha",
-                            operation: "add"
-                        },
-                        alpha: {
-                            srcFactor: "src-alpha",
-                            dstFactor: "one-minus-src-alpha",
-                            operation: "add"
-                        }
-                    }
-                }, 
-            ]
-        };
-    }
-    getBindGroupLayouts() {
-        return this.uniformsKeys.map((key)=>this.uniforms[key].bindGroupLayout
-        );
-    }
-    setBindGroups(renderPass) {
-        this.uniformsKeys.forEach((key, index)=>{
-            renderPass.setBindGroup(index, this.uniforms[key].bindGroup);
-        });
-    }
-    getWgslChunk() {
-        return this.uniformsKeys.reduce((acc, key)=>{
-            return `${acc} ${this.uniforms[key].getWgslChunk(this.uniformsKeys.indexOf(key), key)}`;
-        }, "");
-    }
-}
-exports.default = WebGPUProgram;
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"jqghB":[function(require,module,exports) {
+},{}],"jqghB":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 class WebGPUUniforms {
@@ -11202,13 +11168,30 @@ class WebGPUUniforms {
         const arrayData = [];
         // TODO, array padding and alignment;
         for (let { key , value  } of this.bufferMembers){
-            const arrayIndex = arrayData.length;
+            let arrayIndex = arrayData.length;
+            if (Array.isArray(value)) {
+                const rowSpace = 4 - arrayIndex % 4;
+                switch(rowSpace){
+                    case 1:
+                        arrayData.push(0); // padding
+                        break;
+                    case 2:
+                        if (value.length > 2) arrayData.push(0, 0); // padding
+                        break;
+                    case 3:
+                        if (value.length === 2) arrayData.push(0);
+                        else arrayData.push(0, 0, 0);
+                        break;
+                    default:
+                        break;
+                }
+                arrayIndex = arrayData.length;
+                arrayData.push(...value);
+            } else arrayData.push(value);
             this.uniformsArrayMemberMetadata[key] = {
                 index: arrayIndex,
-                length: value.length || 1
+                length: Array.isArray(value) ? value.length : 1
             };
-            if (Array.isArray(value)) arrayData.push(...value);
-            else arrayData.push(value);
         }
         this.uniformsBuffer = this.device.createBuffer({
             size: arrayData.length * Float32Array.BYTES_PER_ELEMENT,
@@ -11241,7 +11224,7 @@ class WebGPUUniforms {
     get bindGroup() {
         return this._bindGroup;
     }
-    getWgslChunk(groupIndex = "[REPLACE_WITH_GROUP]", uniformsName = "") {
+    getWgslChunk(groupIndex = "[REPLACE_WITH_GROUP_INDEX]", uniformsName = "") {
         const structName = `Uniforms${uniformsName.charAt(0).toUpperCase() + uniformsName.slice(1)}`;
         return `
     ${structName} {
@@ -11460,6 +11443,57 @@ class TextureLoader {
     }
 }
 exports.default = TextureLoader;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3D4I0":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+// TODO — How to update a uniforms group and swap with another
+class WebGPURenderProgram {
+    constructor(renderer, shader, uniforms){
+        this.shader = shader;
+        this.uniforms = uniforms;
+        this.uniformsKeys = Object.keys(this.uniforms);
+    }
+    getFragmentState(renderer, shaderModule) {
+        return {
+            module: shaderModule,
+            entryPoint: "fragment_main",
+            targets: [
+                {
+                    format: renderer.presentationFormat,
+                    blend: {
+                        color: {
+                            srcFactor: "src-alpha",
+                            dstFactor: "one-minus-src-alpha",
+                            operation: "add"
+                        },
+                        alpha: {
+                            srcFactor: "src-alpha",
+                            dstFactor: "one-minus-src-alpha",
+                            operation: "add"
+                        }
+                    }
+                }, 
+            ]
+        };
+    }
+    getBindGroupLayouts() {
+        return this.uniformsKeys.map((key)=>this.uniforms[key].bindGroupLayout
+        );
+    }
+    setBindGroups(renderPass) {
+        this.uniformsKeys.forEach((key, index)=>{
+            this.uniforms[key].update();
+            renderPass.setBindGroup(index, this.uniforms[key].bindGroup);
+        });
+    }
+    getWgslChunk() {
+        return this.uniformsKeys.reduce((acc, key)=>{
+            return `${acc} ${this.uniforms[key].getWgslChunk(this.uniformsKeys.indexOf(key), key)}`;
+        }, "");
+    }
+}
+exports.default = WebGPURenderProgram;
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["8wcER","h7u1C"], "h7u1C", "parcelRequire94c2")
 

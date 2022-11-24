@@ -109,17 +109,43 @@ class WebGPUUniforms {
 
     // TODO, array padding and alignment;
     for (let { key, value } of this.bufferMembers) {
-      const arrayIndex = arrayData.length;
-      this.uniformsArrayMemberMetadata[key] = {
-        index: arrayIndex,
-        length: value.length || 1,
-      };
+      let arrayIndex = arrayData.length;
 
       if (Array.isArray(value)) {
+        const rowSpace = 4 - (arrayIndex % 4);
+
+        switch (rowSpace) {
+          case 1: {
+            arrayData.push(0); // padding
+            break;
+          }
+          case 2: {
+            if (value.length > 2) {
+              arrayData.push(0, 0); // padding
+            }
+            break;
+          }
+          case 3: {
+            if (value.length === 2) {
+              arrayData.push(0);
+            } else {
+              arrayData.push(0, 0, 0);
+            }
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+        arrayIndex = arrayData.length;
         arrayData.push(...value);
       } else {
         arrayData.push(value);
       }
+      this.uniformsArrayMemberMetadata[key] = {
+        index: arrayIndex,
+        length: Array.isArray(value) ? value.length : 1,
+      };
     }
 
     this.uniformsBuffer = this.device.createBuffer({
@@ -168,7 +194,7 @@ class WebGPUUniforms {
   }
 
   public getWgslChunk(
-    groupIndex: string | number = "[REPLACE_WITH_GROUP]",
+    groupIndex: string | number = "[REPLACE_WITH_GROUP_INDEX]",
     uniformsName: string = ""
   ): string {
     const structName = `Uniforms${
