@@ -58,9 +58,6 @@ const init = async () => {
     primitives.createSphereVertices(1, 64, 32) as TGeometryArgs
   );
 
-  // const viewportUniforms = new Uniforms(device as GPUDevice, {
-  //   u_resolution: [canvas.width, canvas.height],
-  // });
   camera = new Camera({
     fov: DEG_TO_RAD * 50,
     aspectRatio: renderer.width / renderer.height,
