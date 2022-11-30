@@ -30,7 +30,7 @@ const requestWebGPU = async () => {
   const adapter = await navigator.gpu.requestAdapter();
   if (!adapter) {
     console.warn("Could not access Adapter");
-    return;
+    return false;
   }
   device = await adapter.requestDevice();
   return device;

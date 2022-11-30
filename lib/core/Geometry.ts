@@ -20,7 +20,7 @@ class Geometry {
     renderer: Renderer,
     { indices, normal, position, texcoord }: TGeometryArgs
   ) {
-    this._vertexCount = indices.length;
+    this._vertexCount = indices?.length;
 
     this.positionBuffer = renderer.device.createBuffer({
       size: position.byteLength,
