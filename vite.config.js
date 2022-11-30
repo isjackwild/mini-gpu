@@ -22,13 +22,11 @@ export default defineConfig({
           "gl-matrix": "glMatrix",
         },
       },
-      plugins: [
-        dts({
-          // insertTypesEntry: true,
-          skipDiagnostics: true,
-          // include: "lib/*",
-        }),
-      ],
+      // plugins: [
+      //   dts({
+      //     skipDiagnostics: true,
+      //   }),
+      // ],
     },
   },
 });
