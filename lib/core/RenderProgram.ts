@@ -7,9 +7,13 @@ class WebGPURenderProgram {
   constructor(
     renderer: Renderer,
     public shader: string,
-    public uniforms: { [key: string]: Uniforms }
+    private _uniforms: { [key: string]: Uniforms }
   ) {
     this.uniformsKeys = Object.keys(this.uniforms);
+  }
+
+  public get uniforms(): { [key: string]: Uniforms } {
+    return this._uniforms;
   }
 
   public getFragmentState(

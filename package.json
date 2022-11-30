@@ -16,20 +16,26 @@
     "wgsl"
   ],
   "source": "src/index.ts",
-  "main": "dist/main.js",
-  "module": "dist/module.js",
+  "main": "./dist/minigpu.umd.js",
+  "module": "./dist/minigpu.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/minigpu.es.js",
+      "require": "./dist/minigpu.umd.js"
+    }
+  },
   "types": "dist/types.d.ts",
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
-    "watch": "parcel watch --no-cache",
-    "build": "parcel build"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "devDependencies": {
-    "@parcel/packager-ts": "^2.8.0",
-    "@parcel/transformer-typescript-types": "^2.8.0",
     "@webgpu/types": "^0.1.21",
-    "parcel": "^2.3.2",
-    "typescript": "^4.9.3"
+    "twgl.js": "^5.3.0",
+    "typescript": "^4.6.4",
+    "vite": "^3.2.3"
   },
   "dependencies": {
     "@swc/helpers": "^0.4.14",

@@ -1,8 +1,21 @@
 {
   "compilerOptions": {
-    "types": ["@webgpu/types"],
-    "lib": ["es2017", "DOM"],
-    "target": "es2017",
+    "target": "ESNext",
+    "strict": false,
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "noEmit": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "skipLibCheck": true,
+    "types": ["@webgpu/types/dist/index"],
     "typeRoots": ["./node_modules/@types", "./node_modules/@webgpu"]
-  }
+  },
+  "include": ["src"]
 }

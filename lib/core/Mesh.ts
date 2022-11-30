@@ -23,6 +23,9 @@ class Mesh implements RenderableInterface {
       layout: pipelineLayout,
       vertex: vertexState,
       fragment: fragmentState,
+      primitive: {
+        topology: "line-list",
+      },
       depthStencil: {
         format: renderer.depthFormat,
         depthWriteEnabled: true,

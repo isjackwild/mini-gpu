@@ -39,6 +39,60 @@ class Uniforms {
     this._uniform = new Proxy({}, handler);
   }
 
+  private createArraysAndBuffers(): void {
+    const arrayData: number[] = [];
+
+    // TODO, array padding and alignment;
+    for (let { key, value: _value } of this.bufferMembers) {
+      let arrayIndex = arrayData.length;
+
+      const value = _value.byteLength ? Array.from(_value) : _value;
+
+      if (Array.isArray(value)) {
+        const rowSpace = 4 - (arrayIndex % 4);
+
+        switch (rowSpace) {
+          case 1: {
+            arrayData.push(0); // padding
+            break;
+          }
+          case 2: {
+            if (value.length > 2) {
+              arrayData.push(0, 0); // padding
+            }
+            break;
+          }
+          case 3: {
+            if (value.length === 2) {
+              arrayData.push(0);
+            } else {
+              arrayData.push(0, 0, 0);
+            }
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+        arrayIndex = arrayData.length;
+        arrayData.push(...value);
+      } else {
+        arrayData.push(value);
+      }
+      this.uniformsArrayMemberMetadata[key] = {
+        index: arrayIndex,
+        length: Array.isArray(value) ? value.length : 1,
+      };
+    }
+
+    this.uniformsBuffer = this.device.createBuffer({
+      size: arrayData.length * Float32Array.BYTES_PER_ELEMENT,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    });
+    this.uniformsArray = new Float32Array(arrayData);
+    this.update();
+  }
+
   private createBindGroup(): void {
     const entriesLayout: GPUBindGroupLayoutEntry[] = [];
     entriesLayout.push({
@@ -104,58 +158,6 @@ class Uniforms {
     });
   }
 
-  private createArraysAndBuffers(): void {
-    const arrayData: number[] = [];
-
-    // TODO, array padding and alignment;
-    for (let { key, value } of this.bufferMembers) {
-      let arrayIndex = arrayData.length;
-
-      if (Array.isArray(value)) {
-        const rowSpace = 4 - (arrayIndex % 4);
-
-        switch (rowSpace) {
-          case 1: {
-            arrayData.push(0); // padding
-            break;
-          }
-          case 2: {
-            if (value.length > 2) {
-              arrayData.push(0, 0); // padding
-            }
-            break;
-          }
-          case 3: {
-            if (value.length === 2) {
-              arrayData.push(0);
-            } else {
-              arrayData.push(0, 0, 0);
-            }
-            break;
-          }
-          default: {
-            break;
-          }
-        }
-        arrayIndex = arrayData.length;
-        arrayData.push(...value);
-      } else {
-        arrayData.push(value);
-      }
-      this.uniformsArrayMemberMetadata[key] = {
-        index: arrayIndex,
-        length: Array.isArray(value) ? value.length : 1,
-      };
-    }
-
-    this.uniformsBuffer = this.device.createBuffer({
-      size: arrayData.length * Float32Array.BYTES_PER_ELEMENT,
-      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-    });
-    this.uniformsArray = new Float32Array(arrayData);
-    this.update();
-  }
-
   private proxyGetHandler(target, prop) {
     const { index, length } = this.uniformsArrayMemberMetadata[prop];
 
@@ -168,6 +170,9 @@ class Uniforms {
   private proxySetHandler(target, prop, reciever) {
     const { index } = this.uniformsArrayMemberMetadata[prop];
 
+    if (reciever.byteLength) {
+      reciever = Array.from(reciever);
+    }
     if (Array.isArray(reciever)) {
       this.uniformsArray.set(reciever, index);
     } else {
@@ -203,7 +208,6 @@ class Uniforms {
     return `
     ${structName} {
         ${this.bufferMembers.reduce((acc, { key, value }) => {
-          console.log(value);
           const type = Array.isArray(value) ? `vec${value.length}<f32>` : "f32";
           if (acc === "") {
             return `${key} : ${type},`;
