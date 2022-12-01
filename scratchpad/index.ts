@@ -75,10 +75,16 @@ const init = async () => {
     new Float32Array([0, 1, 2, 3, 4, 5])
   );
 
-  const renderProgram = new RenderProgram(renderer, renderShader, geometry, {
-    uniforms,
-    pingPong,
-  });
+  const renderProgram = new RenderProgram(
+    renderer,
+    renderShader,
+    geometry,
+    {
+      uniforms,
+      pingPong,
+    },
+    true
+  );
   renderer.add(renderProgram);
 
   const computeProgram = new ComputeProgram(

@@ -11,7 +11,8 @@ class RenderProgram extends Program implements RenderableInterface {
     private renderer: Renderer,
     public shader: string,
     private geometry: Geometry,
-    protected _inputs: { [key: string]: ProgramInputInterface }
+    protected _inputs: { [key: string]: ProgramInputInterface },
+    wireframe = false
   ) {
     super();
     this.inputsKeys = Object.keys(this.inputs);
@@ -30,7 +31,7 @@ class RenderProgram extends Program implements RenderableInterface {
       vertex: vertexState,
       fragment: fragmentState,
       primitive: {
-        topology: "line-list",
+        topology: wireframe ? "line-list" : "triangle-list",
       },
       depthStencil: {
         format: renderer.depthFormat,
