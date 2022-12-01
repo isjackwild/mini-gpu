@@ -4,7 +4,7 @@
 
 # ⚠️ Disclaimer! ⚠️
 
-As WebGPU is a brand new API, and this library is very much a work in progress (as well as my first library), you can expect breaking changes. Only a fool would thing of using this thing in a production setting for the time being, but it's always fun to play around with new toys!
+As WebGPU is a brand new API, and this library is very much a work in progress (as well as my first library), you can expect breaking changes. **Only a fool would think of using this thing in a production setting for the time being**, but it's always fun to play around with new toys!
 
 It has only been tested in [Chrome Canary](https://www.google.com/intl/en_uk/chrome/canary/), and you need to enable the WebGPU flag.
 
@@ -12,7 +12,7 @@ It has only been tested in [Chrome Canary](https://www.google.com/intl/en_uk/chr
 
 # Motivation
 
-This mini library is a side project which has come out of my own experiments with WebGPU at [Google Arts & Culture Lab](https://artsandculture.google.com/), and **a desire to come up with a good structure** for writing WebGPU code. I'm basically attempting to simplify a few common use cases, and to abstract some of the boilerplate code you need to write to get something to happen.
+This mini library is a side project which has come out of my own experiments with WebGPU at [Google Arts & Culture Lab](https://artsandculture.google.com/), and **a desire to come up with a good structure for writing WebGPU code.** I'm basically attempting to simplify a few common use cases, and to abstract some of the boilerplate code you need to write to get something to happen.
 
 It certainly doesn't (and doesn't aim to) do it all, and if you're after something highly configurable, you'll probably want to write it yourself, but if you're just looking for somewhere to get started, then come on in.
 
@@ -49,7 +49,7 @@ Mini GPU supports both render pipelines and compute pipelines, and they follow a
 
 0. Get access to your machines GPU device.
 1. Create a `Renderer` or `Computer` to run your programs.
-2. Create one or multiple program inputs. There are currently two supported input types: `UniformsInput` (which creates a set of... wait for it... uniforms) and `PingPongInput` (which creates a swappable pingpong buffer for doing GPGPU).
+2. Create one or multiple program inputs. There are currently two supported input types: `UniformsInput` (which creates a set of... wait for it... uniforms) and `PingPongInput` (which creates a swappable pingpong buffer for doing [GPGPU](https://en.wikipedia.org/wiki/General-purpose_computing_on_graphics_processing_units)).
 3. For Render pipelines, create a `Geometry` by passing in indices, positions, normals and texcoords (I use the awesome [twgl.js](https://twgljs.org/) for this).
 4. Create a `RenderProgram` or a `ComputeProgram` with your WGSL shader code and your program inputs.
 5. Run the programs with the `Renderer` or `Computer`.
