@@ -6,3 +6,5 @@ export { default as Uniforms } from "./core/Uniforms";
 export { default as Camera } from "./utils/Camera";
 export { default as TextureLoader } from "./utils/TextureLoader";
 export { default as OrbitControls } from "./utils/OrbitControls";
+
+export { default as Helpers } from "./core/Helpers";

@@ -6,13 +6,13 @@ import {
   Mesh,
   OrbitControls,
   Camera,
+  Helpers,
 } from "../src";
 import { TGeometryArgs } from "../src/core/Geometry";
 import { primitives } from "twgl.js";
 
 import shader from "./shader.wgsl?raw";
 
-let device: GPUDevice;
 const canvas = document.querySelector("canvas") as HTMLCanvasElement;
 
 let renderer: Renderer;
@@ -22,23 +22,11 @@ let controls: OrbitControls;
 
 const DEG_TO_RAD = 0.0174533;
 
-const requestWebGPU = async () => {
-  if (device) return device;
-
-  const adapter = await navigator.gpu.requestAdapter();
-  if (!adapter) {
-    console.warn("Could not access Adapter");
-    return false;
-  }
-  device = await adapter.requestDevice();
-  return device;
-};
-
 const render = () => {
   camera.aspectRatio = renderer.width / renderer.height;
-  // uniforms.uniform.u_elapsed_time = uniforms.uniform.u_elapsed_time + 0.01;
   renderer.render();
   controls?.update();
+  uniforms.member.u_elapsed_time = uniforms.member.u_elapsed_time + 0.01;
   uniforms.member.u_view_projection_matrix = camera.viewProjectionMatrix;
   requestAnimationFrame(render);
 };
@@ -49,7 +37,7 @@ const init = async () => {
       "WebGPU not available! — Use Chrome Canary and enable-unsafe-gpu in flags."
     );
   }
-  const device = (await requestWebGPU()) as GPUDevice;
+  const device = (await Helpers.requestWebGPU()) as GPUDevice;
   renderer = new Renderer(device as GPUDevice, canvas);
 
   const geometry = new Geometry(
@@ -68,6 +56,7 @@ const init = async () => {
   controls = new OrbitControls(camera, canvas);
   uniforms = new Uniforms(device as GPUDevice, {
     u_view_projection_matrix: camera.viewProjectionMatrix,
+    u_elapsed_time: 0,
   });
 
   const program = new RenderProgram(renderer, shader, geometry, {
