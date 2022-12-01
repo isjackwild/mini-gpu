@@ -27,8 +27,8 @@ class Renderer {
 
     const depthTexture = device.createTexture({
       size: {
-        width: canvas.width,
-        height: canvas.height,
+        width: this.canvas.width,
+        height: this.canvas.height,
         depthOrArrayLayers: 1,
       },
       format: this.depthFormat,

@@ -17,5 +17,5 @@
     "types": ["@webgpu/types/dist/index"],
     "typeRoots": ["./node_modules/@types", "./node_modules/@webgpu"]
   },
-  "include": ["lib"]
+  "include": ["src"]
 }

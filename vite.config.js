@@ -7,7 +7,7 @@ const resolvePath = (str) => resolve(__dirname, str);
 export default defineConfig({
   build: {
     lib: {
-      entry: resolvePath("lib/index.ts"),
+      entry: resolvePath("src/index.ts"),
       name: "MINIGPU",
       fileName: "minigpu",
     },
