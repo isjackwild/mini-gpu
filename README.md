@@ -55,6 +55,30 @@ Mini GPU supports both render pipelines and compute pipelines, and they follow a
 5. Run the programs with the `Renderer` or `Computer`.
 6. Be amazed!!! (Or maybe slightly underwhelmed).
 
+# Extras
+
+## WGSL Header
+
+Because mini GPU sets up your bind groups and their order for you, you might need to get a hint as to what to put in the header of your WGSL code. You can do this by calling
+
+```
+myComputeOrRenderProgram.getWgslChunk();
+```
+
+_Bare in mind that this is still WIP_, so the output might need some tweaking (the types might not be right all the time, but the locations should be.)
+
+## Camera
+
+TODO
+
+## Camera Orbit Controls
+
+TODO
+
+## Texture Loader
+
+TODO
+
 # Examples
 
 ## Render something
