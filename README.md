@@ -4,7 +4,7 @@
 
 # ⚠️ Disclaimer! ⚠️
 
-As WebGPU is a brand new API, and this library is very much a work in progress, you can expect breaking changes. You should amost certainly not be using this in a production setting as of yet, but it's always fun to play around with new toys!
+As WebGPU is a brand new API, and this library is very much a work in progress (as well as my first library), you can expect breaking changes. Only a fool would thing of using this thing in a production setting for the time being, but it's always fun to play around with new toys!
 
 It has only been tested in [Chrome Canary](https://www.google.com/intl/en_uk/chrome/canary/), and you need to enable the WebGPU flag.
 
