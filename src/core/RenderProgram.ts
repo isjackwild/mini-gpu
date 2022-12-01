@@ -1,31 +1,55 @@
-import Renderer from "./Renderer";
+import Geometry from "./Geometry";
+import Renderer, { RenderableInterface } from "./Renderer";
 import Uniforms from "./Uniforms";
 
 // TODO — How to update a uniforms group and swap with another
-class WebGPURenderProgram {
-  private uniformsKeys: string[];
+class RenderProgram implements RenderableInterface {
+  private pipeline: GPURenderPipeline;
+  private inputsKeys: string[];
+
   constructor(
-    renderer: Renderer,
+    private renderer: Renderer,
     public shader: string,
-    private _uniforms: { [key: string]: Uniforms }
+    private geometry: Geometry,
+    private _inputs: { [key: string]: Uniforms }
   ) {
-    this.uniformsKeys = Object.keys(this.uniforms);
+    this.inputsKeys = Object.keys(this.inputs);
+    const shaderModule = renderer.device.createShaderModule({
+      code: this.shader,
+    });
+    const vertexState = this.geometry.getVertexState(shaderModule);
+    const fragmentState = this.getFragmentState(shaderModule);
+
+    const pipelineLayout = renderer.device.createPipelineLayout({
+      bindGroupLayouts: this.getBindGroupLayouts(),
+    });
+
+    this.pipeline = renderer.device.createRenderPipeline({
+      layout: pipelineLayout,
+      vertex: vertexState,
+      fragment: fragmentState,
+      primitive: {
+        topology: "line-list",
+      },
+      depthStencil: {
+        format: renderer.depthFormat,
+        depthWriteEnabled: true,
+        depthCompare: "less",
+      },
+    });
   }
 
-  public get uniforms(): { [key: string]: Uniforms } {
-    return this._uniforms;
+  public get inputs(): { [key: string]: Uniforms } {
+    return this._inputs;
   }
 
-  public getFragmentState(
-    renderer: Renderer,
-    shaderModule: GPUShaderModule
-  ): GPUFragmentState {
+  private getFragmentState(shaderModule: GPUShaderModule): GPUFragmentState {
     return {
       module: shaderModule,
       entryPoint: "fragment_main",
       targets: [
         {
-          format: renderer.presentationFormat,
+          format: this.renderer.presentationFormat,
           blend: {
             color: {
               srcFactor: "src-alpha",
@@ -44,13 +68,13 @@ class WebGPURenderProgram {
   }
 
   public getBindGroupLayouts(): GPUBindGroupLayout[] {
-    return this.uniformsKeys.map((key) => this.uniforms[key].bindGroupLayout);
+    return this.inputsKeys.map((key) => this.inputs[key].bindGroupLayout);
   }
 
   public setBindGroups(renderPass: GPURenderPassEncoder): void {
-    this.uniformsKeys.forEach((key, index) => {
-      this.uniforms[key].update();
-      renderPass.setBindGroup(index, this.uniforms[key].bindGroup);
+    this.inputsKeys.forEach((key, index) => {
+      this.inputs[key].update();
+      renderPass.setBindGroup(index, this.inputs[key].bindGroup);
     });
   }
 
@@ -62,6 +86,18 @@ class WebGPURenderProgram {
       )}`;
     }, "");
   }
+
+  public getCommands(renderPass: GPURenderPassEncoder): void {
+    renderPass.setPipeline(this.pipeline);
+    this.geometry.setVertexBuffers(renderPass);
+    this.setBindGroups(renderPass);
+    renderPass.drawIndexed(
+      this.geometry.vertexCount,
+      this.geometry.instanceCount,
+      0,
+      0
+    );
+  }
 }
 
-export default WebGPURenderProgram;
+export default RenderProgram;

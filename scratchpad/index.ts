@@ -14,8 +14,6 @@ import shader from "./shader.wgsl?raw";
 
 let device: GPUDevice;
 const canvas = document.querySelector("canvas") as HTMLCanvasElement;
-canvas.width = window.innerWidth * window.devicePixelRatio;
-canvas.height = window.innerHeight * window.devicePixelRatio;
 
 let renderer: Renderer;
 let uniforms;
@@ -37,10 +35,11 @@ const requestWebGPU = async () => {
 };
 
 const render = () => {
+  camera.aspectRatio = renderer.width / renderer.height;
   // uniforms.uniform.u_elapsed_time = uniforms.uniform.u_elapsed_time + 0.01;
   renderer.render();
   controls?.update();
-  uniforms.uniform.u_view_projection_matrix = camera.viewProjectionMatrix;
+  uniforms.member.u_view_projection_matrix = camera.viewProjectionMatrix;
   requestAnimationFrame(render);
 };
 
@@ -67,18 +66,17 @@ const init = async () => {
   });
 
   controls = new OrbitControls(camera, canvas);
-
   uniforms = new Uniforms(device as GPUDevice, {
     u_view_projection_matrix: camera.viewProjectionMatrix,
   });
-  const program = new RenderProgram(renderer, shader, {
-    default: uniforms,
-  });
-  console.log(program.getWgslChunk());
 
-  const mesh = new Mesh(renderer, geometry, program);
-  renderer.addRenderable(mesh);
+  const program = new RenderProgram(renderer, shader, geometry, {
+    uniforms: uniforms,
+  });
+  renderer.addRenderable(program);
   requestAnimationFrame(render);
+
+  window.addEventListener("resize", () => renderer.resize());
 };
 
 init();

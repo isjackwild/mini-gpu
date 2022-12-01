@@ -8,12 +8,18 @@ class Renderer {
   public presentationFormat: GPUTextureFormat;
   public depthFormat: GPUTextureFormat = "depth24plus-stencil8";
   private renderPassDescriptor: GPURenderPassDescriptor;
+  private _pixelRatio = window.devicePixelRatio;
+  private presentationSize = { width: 0, height: 0 };
 
   constructor(
     public device: GPUDevice,
     private canvas: HTMLCanvasElement,
     options: { alphaMode?: GPUCanvasAlphaMode } = {}
   ) {
+    this.presentationSize.width = this.canvas.clientWidth * this.pixelRatio;
+    this.presentationSize.height = this.canvas.clientHeight * this.pixelRatio;
+    this.canvas.width = this.presentationSize.width;
+    this.canvas.height = this.presentationSize.height;
     this.ctx = this.canvas.getContext("webgpu") as GPUCanvasContext;
     this.presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
@@ -27,19 +33,18 @@ class Renderer {
 
     const depthTexture = device.createTexture({
       size: {
-        width: this.canvas.width,
-        height: this.canvas.height,
+        width: this.width,
+        height: this.height,
         depthOrArrayLayers: 1,
       },
       format: this.depthFormat,
       usage: GPUTextureUsage.RENDER_ATTACHMENT,
     });
 
-    const colorView = this.ctx.getCurrentTexture().createView();
     this.renderPassDescriptor = {
       colorAttachments: [
         {
-          view: colorView,
+          view: this.ctx.getCurrentTexture().createView(),
           clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 0.0 },
           loadOp: "clear",
           storeOp: "store",
@@ -57,11 +62,48 @@ class Renderer {
   }
 
   public get width(): number {
-    return this.canvas.width;
+    return this.presentationSize.width;
   }
 
   public get height(): number {
-    return this.canvas.height;
+    return this.presentationSize.height;
+  }
+
+  public get pixelRatio(): number {
+    return this._pixelRatio;
+  }
+
+  public set pixelRatio(pixelRatio: number) {
+    this._pixelRatio = pixelRatio;
+    this.resize();
+  }
+
+  public resize(width?: number, height?: number): void {
+    const newWidth = (width || this.canvas.clientWidth) * this.pixelRatio;
+    const newHeight = (height || this.canvas.clientHeight) * this.pixelRatio;
+
+    if (newWidth === this.width && newHeight === this.height) return;
+
+    this.presentationSize.width = newWidth;
+    this.presentationSize.height = newHeight;
+
+    this.canvas.width = this.presentationSize.width;
+    this.canvas.height = this.presentationSize.height;
+
+    const depthTexture = this.device.createTexture({
+      size: {
+        width: this.width,
+        height: this.height,
+        depthOrArrayLayers: 1,
+      },
+      format: this.depthFormat,
+      usage: GPUTextureUsage.RENDER_ATTACHMENT,
+    });
+    this.renderPassDescriptor.depthStencilAttachment.view =
+      depthTexture.createView();
+    this.renderPassDescriptor.colorAttachments[0].view = this.ctx
+      .getCurrentTexture()
+      .createView();
   }
 
   public addRenderable(renderable: RenderableInterface): void {

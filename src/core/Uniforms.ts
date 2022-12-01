@@ -1,5 +1,5 @@
 class Uniforms {
-  private _uniform: ProxyConstructor;
+  private _member: ProxyConstructor;
 
   private bufferMembers: { key: string; value: any }[] = [];
   private textures: { key: string; value: GPUTexture }[] = [];
@@ -36,7 +36,7 @@ class Uniforms {
         return this.proxySetHandler(target, prop, reciever);
       },
     };
-    this._uniform = new Proxy({}, handler);
+    this._member = new Proxy({}, handler);
   }
 
   private createArraysAndBuffers(): void {
@@ -186,8 +186,8 @@ class Uniforms {
     return true;
   }
 
-  public get uniform(): any {
-    return this._uniform;
+  public get member(): any {
+    return this._member;
   }
 
   public get bindGroupLayout(): GPUBindGroupLayout {
