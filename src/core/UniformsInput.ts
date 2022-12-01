@@ -1,4 +1,11 @@
-class Uniforms {
+export interface ProgramInputInterface {
+  bindGroupLayout: GPUBindGroupLayout;
+  bindGroup: GPUBindGroup;
+  update(): void;
+  getWgslChunk(groupIndex: string | number, name: string): string;
+}
+
+class UniformsInput implements ProgramInputInterface {
   private _member: ProxyConstructor;
 
   private bufferMembers: { key: string; value: any }[] = [];
@@ -200,10 +207,10 @@ class Uniforms {
 
   public getWgslChunk(
     groupIndex: string | number = "[REPLACE_WITH_GROUP_INDEX]",
-    uniformsName: string = ""
+    name: string = ""
   ): string {
     const structName = `Uniforms${
-      uniformsName.charAt(0).toUpperCase() + uniformsName.slice(1)
+      name.charAt(0).toUpperCase() + name.slice(1)
     }`;
     return `
     ${structName} {
@@ -219,8 +226,8 @@ class Uniforms {
     }
 
     @group(${groupIndex}) @binding(0) var<uniform> uniforms${
-      uniformsName ? "_" : ""
-    }${uniformsName} : ${structName};
+      name ? "_" : ""
+    }${name} : ${structName};
     `;
   }
 
@@ -231,4 +238,4 @@ class Uniforms {
   }
 }
 
-export default Uniforms;
+export default UniformsInput;

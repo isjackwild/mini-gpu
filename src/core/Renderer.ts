@@ -114,7 +114,7 @@ class Renderer {
     this.renderables.delete(renderable);
   }
 
-  public render() {
+  public renderAll() {
     this.renderPassDescriptor.colorAttachments[0].view = this.ctx
       .getCurrentTexture()
       .createView();
@@ -127,6 +127,23 @@ class Renderer {
     for (const renderable of this.renderables) {
       renderable.getCommands(renderPass);
     }
+
+    renderPass.end();
+    const commands = commandEncoder.finish();
+    this.device.queue.submit([commands]);
+  }
+
+  public render(renderable: RenderableInterface): void {
+    this.renderPassDescriptor.colorAttachments[0].view = this.ctx
+      .getCurrentTexture()
+      .createView();
+
+    const commandEncoder = this.device.createCommandEncoder();
+    const renderPass = commandEncoder.beginRenderPass(
+      this.renderPassDescriptor
+    );
+
+    renderable.getCommands(renderPass);
 
     renderPass.end();
     const commands = commandEncoder.finish();

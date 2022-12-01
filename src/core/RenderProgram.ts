@@ -1,6 +1,6 @@
 import Geometry from "./Geometry";
 import Renderer, { RenderableInterface } from "./Renderer";
-import Uniforms from "./Uniforms";
+import Uniforms, { ProgramInputInterface } from "./UniformsInput";
 
 // TODO — How to update a uniforms group and swap with another
 class RenderProgram implements RenderableInterface {
@@ -11,7 +11,7 @@ class RenderProgram implements RenderableInterface {
     private renderer: Renderer,
     public shader: string,
     private geometry: Geometry,
-    private _inputs: { [key: string]: Uniforms }
+    private _inputs: { [key: string]: ProgramInputInterface }
   ) {
     this.inputsKeys = Object.keys(this.inputs);
     const shaderModule = renderer.device.createShaderModule({
@@ -39,7 +39,7 @@ class RenderProgram implements RenderableInterface {
     });
   }
 
-  public get inputs(): { [key: string]: Uniforms } {
+  public get inputs(): { [key: string]: ProgramInputInterface } {
     return this._inputs;
   }
 
@@ -79,9 +79,9 @@ class RenderProgram implements RenderableInterface {
   }
 
   public getWgslChunk(): string {
-    return this.uniformsKeys.reduce((acc, key) => {
-      return `${acc} ${this.uniforms[key].getWgslChunk(
-        this.uniformsKeys.indexOf(key),
+    return this.inputsKeys.reduce((acc, key) => {
+      return `${acc} ${this.inputs[key].getWgslChunk(
+        this.inputsKeys.indexOf(key),
         key
       )}`;
     }, "");

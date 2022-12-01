@@ -2,8 +2,8 @@ import {
   Renderer,
   RenderProgram,
   Geometry,
-  Uniforms,
-  Mesh,
+  UniformsInput,
+  PingPongInput,
   OrbitControls,
   Camera,
   Helpers,
@@ -16,7 +16,7 @@ import shader from "./shader.wgsl?raw";
 const canvas = document.querySelector("canvas") as HTMLCanvasElement;
 
 let renderer: Renderer;
-let uniforms;
+let uniforms: UniformsInput, pingPong: PingPongInput;
 let camera: Camera;
 let controls: OrbitControls;
 
@@ -24,8 +24,9 @@ const DEG_TO_RAD = 0.0174533;
 
 const render = () => {
   camera.aspectRatio = renderer.width / renderer.height;
-  renderer.render();
+  renderer.renderAll();
   controls?.update();
+  pingPong.step();
   uniforms.member.u_elapsed_time = uniforms.member.u_elapsed_time + 0.01;
   uniforms.member.u_view_projection_matrix = camera.viewProjectionMatrix;
   requestAnimationFrame(render);
@@ -54,14 +55,17 @@ const init = async () => {
   });
 
   controls = new OrbitControls(camera, canvas);
-  uniforms = new Uniforms(device as GPUDevice, {
+  uniforms = new UniformsInput(device as GPUDevice, {
     u_view_projection_matrix: camera.viewProjectionMatrix,
     u_elapsed_time: 0,
   });
+  pingPong = new PingPongInput(device as GPUDevice, new Float32Array([0]));
 
   const program = new RenderProgram(renderer, shader, geometry, {
-    uniforms: uniforms,
+    uniforms,
+    pingPong,
   });
+  console.log(program.getWgslChunk());
   renderer.addRenderable(program);
   requestAnimationFrame(render);
 

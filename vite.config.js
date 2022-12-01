@@ -8,7 +8,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolvePath("src/index.ts"),
-      name: "MINIGPU",
+      name: "miniGPU",
       fileName: "minigpu",
     },
     rollupOptions: {
