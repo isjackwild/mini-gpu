@@ -1,6 +1,8 @@
 import {
   Renderer,
+  Computer,
   RenderProgram,
+  ComputeProgram,
   Geometry,
   UniformsInput,
   PingPongInput,
@@ -11,24 +13,32 @@ import {
 import { TGeometryArgs } from "../src/core/Geometry";
 import { primitives } from "twgl.js";
 
-import shader from "./shader.wgsl?raw";
+import renderShader from "./render.wgsl?raw";
+import computeShader from "./compute.wgsl?raw";
 
 const canvas = document.querySelector("canvas") as HTMLCanvasElement;
 
-let renderer: Renderer;
+let renderer: Renderer, computer: Computer;
 let uniforms: UniformsInput, pingPong: PingPongInput;
 let camera: Camera;
 let controls: OrbitControls;
 
 const DEG_TO_RAD = 0.0174533;
 
+const readPingPong = async () => {
+  const data = await pingPong.read();
+  if (!data) return;
+};
+
 const render = () => {
   camera.aspectRatio = renderer.width / renderer.height;
   renderer.renderAll();
-  controls?.update();
+  computer.runAll();
   pingPong.step();
+  controls?.update();
   uniforms.member.u_elapsed_time = uniforms.member.u_elapsed_time + 0.01;
   uniforms.member.u_view_projection_matrix = camera.viewProjectionMatrix;
+  readPingPong();
   requestAnimationFrame(render);
 };
 
@@ -40,6 +50,7 @@ const init = async () => {
   }
   const device = (await Helpers.requestWebGPU()) as GPUDevice;
   renderer = new Renderer(device as GPUDevice, canvas);
+  computer = new Computer(device as GPUDevice);
 
   const geometry = new Geometry(
     renderer,
@@ -59,14 +70,28 @@ const init = async () => {
     u_view_projection_matrix: camera.viewProjectionMatrix,
     u_elapsed_time: 0,
   });
-  pingPong = new PingPongInput(device as GPUDevice, new Float32Array([0]));
+  pingPong = new PingPongInput(
+    device as GPUDevice,
+    new Float32Array([0, 1, 2, 3, 4, 5])
+  );
 
-  const program = new RenderProgram(renderer, shader, geometry, {
+  const renderProgram = new RenderProgram(renderer, renderShader, geometry, {
     uniforms,
     pingPong,
   });
-  console.log(program.getWgslChunk());
-  renderer.add(program);
+  renderer.add(renderProgram);
+
+  const computeProgram = new ComputeProgram(
+    device,
+    computeShader,
+    {
+      values: pingPong,
+    },
+    pingPong.length,
+    64
+  );
+  computer.add(computeProgram);
+
   requestAnimationFrame(render);
 
   window.addEventListener("resize", () => renderer.resize());

@@ -13,7 +13,7 @@ class PingPongInput implements ProgramInputInterface {
   private bindGroupSwapIndex = 0;
   private isReadingStagingBuffer = false;
 
-  constructor(private device: GPUDevice, data: Float32Array) {
+  constructor(private device: GPUDevice, private data: Float32Array) {
     this._bindGroupLayout = this.device.createBindGroupLayout({
       entries: [
         {
@@ -35,7 +35,10 @@ class PingPongInput implements ProgramInputInterface {
     const size = data.byteLength;
     this.bufferA = this.device.createBuffer({
       size,
-      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+      usage:
+        GPUBufferUsage.STORAGE |
+        GPUBufferUsage.COPY_DST |
+        GPUBufferUsage.COPY_SRC,
       mappedAtCreation: true,
     });
     new Float32Array(this.bufferA.getMappedRange()).set([...data]);
@@ -43,7 +46,10 @@ class PingPongInput implements ProgramInputInterface {
 
     this.bufferB = this.device.createBuffer({
       size,
-      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+      usage:
+        GPUBufferUsage.STORAGE |
+        GPUBufferUsage.COPY_DST |
+        GPUBufferUsage.COPY_SRC,
     });
 
     this.stagingBuffer = this.device.createBuffer({
@@ -66,6 +72,14 @@ class PingPongInput implements ProgramInputInterface {
         { binding: 1, resource: { buffer: this.bufferA } },
       ],
     });
+  }
+
+  public get length(): number {
+    return this.data.length;
+  }
+
+  public get byteLength(): number {
+    return this.data.byteLength;
   }
 
   public get bindGroupLayout(): GPUBindGroupLayout {

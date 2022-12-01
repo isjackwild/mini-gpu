@@ -1,5 +1,7 @@
 export { default as Renderer } from "./core/Renderer";
+export { default as Computer } from "./core/Computer";
 export { default as RenderProgram } from "./core/RenderProgram";
+export { default as ComputeProgram } from "./core/ComputeProgram";
 export { default as Geometry } from "./core/Geometry";
 export { default as UniformsInput } from "./core/UniformsInput";
 export { default as PingPongInput } from "./core/PingPongInput";

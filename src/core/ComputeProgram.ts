@@ -9,13 +9,17 @@ class ComputeProgram extends Program implements ComputableInterface {
   constructor(
     private device: GPUDevice,
     public shader: string,
-    protected _inputs: { [key: string]: ProgramInputInterface }
+    protected _inputs: { [key: string]: ProgramInputInterface },
+    private count,
+    private workgroupSize
   ) {
     super();
     this.inputsKeys = Object.keys(this.inputs);
     const shaderModule = this.device.createShaderModule({
       code: this.shader,
     });
+
+    console.log(this.getBindGroupLayouts());
 
     const pipelineLayout = this.device.createPipelineLayout({
       bindGroupLayouts: this.getBindGroupLayouts(),
@@ -37,7 +41,7 @@ class ComputeProgram extends Program implements ComputableInterface {
   public getCommands(computePass: GPUComputePassEncoder): void {
     computePass.setPipeline(this.pipeline);
     this.setBindGroups(computePass);
-    computePass.dispatchWorkgroups(1);
+    computePass.dispatchWorkgroups(Math.ceil(this.count / this.workgroupSize));
   }
 }
 
