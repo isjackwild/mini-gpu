@@ -1,18 +1,19 @@
 import Geometry from "./Geometry";
+import Program from "./Program";
 import Renderer, { RenderableInterface } from "./Renderer";
 import Uniforms, { ProgramInputInterface } from "./UniformsInput";
 
 // TODO — How to update a uniforms group and swap with another
-class RenderProgram implements RenderableInterface {
-  private pipeline: GPURenderPipeline;
-  private inputsKeys: string[];
+class RenderProgram extends Program implements RenderableInterface {
+  declare pipeline: GPURenderPipeline;
 
   constructor(
     private renderer: Renderer,
     public shader: string,
     private geometry: Geometry,
-    private _inputs: { [key: string]: ProgramInputInterface }
+    protected _inputs: { [key: string]: ProgramInputInterface }
   ) {
+    super();
     this.inputsKeys = Object.keys(this.inputs);
     const shaderModule = renderer.device.createShaderModule({
       code: this.shader,
@@ -67,24 +68,8 @@ class RenderProgram implements RenderableInterface {
     };
   }
 
-  public getBindGroupLayouts(): GPUBindGroupLayout[] {
-    return this.inputsKeys.map((key) => this.inputs[key].bindGroupLayout);
-  }
-
   public setBindGroups(renderPass: GPURenderPassEncoder): void {
-    this.inputsKeys.forEach((key, index) => {
-      this.inputs[key].update();
-      renderPass.setBindGroup(index, this.inputs[key].bindGroup);
-    });
-  }
-
-  public getWgslChunk(): string {
-    return this.inputsKeys.reduce((acc, key) => {
-      return `${acc} ${this.inputs[key].getWgslChunk(
-        this.inputsKeys.indexOf(key),
-        key
-      )}`;
-    }, "");
+    super.setBindGroups(renderPass);
   }
 
   public getCommands(renderPass: GPURenderPassEncoder): void {

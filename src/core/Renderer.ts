@@ -1,10 +1,10 @@
 export interface RenderableInterface {
-  getCommands(renderPassDescriptor: GPURenderPassEncoder): void;
+  getCommands(renderPass: GPURenderPassEncoder): void;
 }
 
 class Renderer {
   public ctx: GPUCanvasContext;
-  private renderables: Set<RenderableInterface> = new Set();
+  private items: Set<RenderableInterface> = new Set();
   public presentationFormat: GPUTextureFormat;
   public depthFormat: GPUTextureFormat = "depth24plus-stencil8";
   private renderPassDescriptor: GPURenderPassDescriptor;
@@ -106,31 +106,12 @@ class Renderer {
       .createView();
   }
 
-  public addRenderable(renderable: RenderableInterface): void {
-    this.renderables.add(renderable);
+  public add(renderable: RenderableInterface): void {
+    this.items.add(renderable);
   }
 
-  public removeRenderable(renderable: RenderableInterface): void {
-    this.renderables.delete(renderable);
-  }
-
-  public renderAll() {
-    this.renderPassDescriptor.colorAttachments[0].view = this.ctx
-      .getCurrentTexture()
-      .createView();
-
-    const commandEncoder = this.device.createCommandEncoder();
-    const renderPass = commandEncoder.beginRenderPass(
-      this.renderPassDescriptor
-    );
-
-    for (const renderable of this.renderables) {
-      renderable.getCommands(renderPass);
-    }
-
-    renderPass.end();
-    const commands = commandEncoder.finish();
-    this.device.queue.submit([commands]);
+  public remove(renderable: RenderableInterface): void {
+    this.items.delete(renderable);
   }
 
   public render(renderable: RenderableInterface): void {
@@ -144,6 +125,25 @@ class Renderer {
     );
 
     renderable.getCommands(renderPass);
+
+    renderPass.end();
+    const commands = commandEncoder.finish();
+    this.device.queue.submit([commands]);
+  }
+
+  public renderAll() {
+    this.renderPassDescriptor.colorAttachments[0].view = this.ctx
+      .getCurrentTexture()
+      .createView();
+
+    const commandEncoder = this.device.createCommandEncoder();
+    const renderPass = commandEncoder.beginRenderPass(
+      this.renderPassDescriptor
+    );
+
+    for (const renderable of this.items) {
+      renderable.getCommands(renderPass);
+    }
 
     renderPass.end();
     const commands = commandEncoder.finish();

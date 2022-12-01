@@ -66,7 +66,7 @@ const init = async () => {
     pingPong,
   });
   console.log(program.getWgslChunk());
-  renderer.addRenderable(program);
+  renderer.add(program);
   requestAnimationFrame(render);
 
   window.addEventListener("resize", () => renderer.resize());

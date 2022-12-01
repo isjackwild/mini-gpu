@@ -5,11 +5,13 @@ class PingPongInput implements ProgramInputInterface {
 
   private bufferA: GPUBuffer;
   private bufferB: GPUBuffer;
+  private stagingBuffer: GPUBuffer;
 
   private bindGroupA: GPUBindGroup;
   private bindGroupB: GPUBindGroup;
 
   private bindGroupSwapIndex = 0;
+  private isReadingStagingBuffer = false;
 
   constructor(private device: GPUDevice, data: Float32Array) {
     this._bindGroupLayout = this.device.createBindGroupLayout({
@@ -44,6 +46,11 @@ class PingPongInput implements ProgramInputInterface {
       usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
     });
 
+    this.stagingBuffer = this.device.createBuffer({
+      size,
+      usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST,
+    });
+
     this.bindGroupA = this.device.createBindGroup({
       layout: this.bindGroupLayout,
       entries: [
@@ -69,6 +76,10 @@ class PingPongInput implements ProgramInputInterface {
     return this.bindGroupSwapIndex % 2 === 0
       ? this.bindGroupA
       : this.bindGroupB;
+  }
+
+  public get buffer(): GPUBuffer {
+    return this.bindGroupSwapIndex % 2 === 0 ? this.bufferA : this.bufferB;
   }
 
   public step(): void {
@@ -97,6 +108,36 @@ class PingPongInput implements ProgramInputInterface {
   }
 
   public update() {}
+
+  public async read(): Promise<Float32Array | null> {
+    if (this.isReadingStagingBuffer) return null;
+    this.isReadingStagingBuffer = true;
+
+    const commandEncoder = this.device.createCommandEncoder();
+    commandEncoder.copyBufferToBuffer(
+      this.buffer,
+      0,
+      this.stagingBuffer,
+      0,
+      this.stagingBuffer.size
+    );
+    this.device.queue.submit([commandEncoder.finish()]);
+
+    await this.stagingBuffer.mapAsync(
+      GPUMapMode.READ,
+      0,
+      this.stagingBuffer.size
+    );
+    const copyArrayBuffer = this.stagingBuffer.getMappedRange(
+      0,
+      this.stagingBuffer.size
+    );
+    const data = copyArrayBuffer.slice(0);
+
+    this.stagingBuffer.unmap();
+    this.isReadingStagingBuffer = false;
+    return new Float32Array(data);
+  }
 }
 
 export default PingPongInput;
