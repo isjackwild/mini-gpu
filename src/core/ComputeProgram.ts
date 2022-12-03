@@ -19,8 +19,6 @@ class ComputeProgram extends Program implements ComputableInterface {
       code: this.shader,
     });
 
-    console.log(this.getBindGroupLayouts());
-
     const pipelineLayout = this.device.createPipelineLayout({
       bindGroupLayouts: this.getBindGroupLayouts(),
     });

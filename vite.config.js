@@ -22,11 +22,11 @@ export default defineConfig({
           "gl-matrix": "glMatrix",
         },
       },
-      // plugins: [
-      //   dts({
-      //     skipDiagnostics: true,
-      //   }),
-      // ],
+      plugins: [
+        dts({
+          skipDiagnostics: true,
+        }),
+      ],
     },
   },
 });

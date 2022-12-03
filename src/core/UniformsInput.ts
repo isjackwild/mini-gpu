@@ -1,3 +1,7 @@
+import StructuredFloat32Array, {
+  TStructuredFloat32ArrayAcceptedTypes,
+} from "./StructuredFloat32Array";
+
 export interface ProgramInputInterface {
   bindGroupLayout: GPUBindGroupLayout;
   bindGroup: GPUBindGroup;
@@ -11,10 +15,7 @@ class UniformsInput implements ProgramInputInterface {
   private bufferMembers: { key: string; value: any }[] = [];
   private textures: { key: string; value: GPUTexture }[] = [];
 
-  private uniformsArray: Float32Array;
-  private uniformsArrayMemberMetadata: {
-    [key: string]: { index: number; length: number };
-  } = {};
+  private uniformsArray: StructuredFloat32Array;
   private uniformsBuffer: GPUBuffer;
   private bufferNeedsUpdate = true;
   private _bindGroup: GPUBindGroup;
@@ -47,56 +48,23 @@ class UniformsInput implements ProgramInputInterface {
   }
 
   private createArraysAndBuffers(): void {
-    const arrayData: number[] = [];
-
-    // TODO, array padding and alignment;
-    for (let { key, value: _value } of this.bufferMembers) {
-      let arrayIndex = arrayData.length;
-
-      const value = _value.byteLength ? Array.from(_value) : _value;
-
-      if (Array.isArray(value)) {
-        const rowSpace = 4 - (arrayIndex % 4);
-
-        switch (rowSpace) {
-          case 1: {
-            arrayData.push(0); // padding
-            break;
-          }
-          case 2: {
-            if (value.length > 2) {
-              arrayData.push(0, 0); // padding
-            }
-            break;
-          }
-          case 3: {
-            if (value.length === 2) {
-              arrayData.push(0);
-            } else {
-              arrayData.push(0, 0, 0);
-            }
-            break;
-          }
-          default: {
-            break;
-          }
-        }
-        arrayIndex = arrayData.length;
-        arrayData.push(...value);
-      } else {
-        arrayData.push(value);
+    const structuredArrayInitializer = this.bufferMembers.reduce(
+      (acc, value) => {
+        acc[value.key] = value.value;
+        return acc;
+      },
+      {}
+    );
+    this.uniformsArray = new StructuredFloat32Array(
+      structuredArrayInitializer as any as {
+        [key: string]: TStructuredFloat32ArrayAcceptedTypes;
       }
-      this.uniformsArrayMemberMetadata[key] = {
-        index: arrayIndex,
-        length: Array.isArray(value) ? value.length : 1,
-      };
-    }
+    );
 
     this.uniformsBuffer = this.device.createBuffer({
-      size: arrayData.length * Float32Array.BYTES_PER_ELEMENT,
+      size: this.uniformsArray.byteLength,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
-    this.uniformsArray = new Float32Array(arrayData);
     this.update();
   }
 
@@ -166,30 +134,17 @@ class UniformsInput implements ProgramInputInterface {
   }
 
   private proxyGetHandler(target, prop) {
-    const { index, length } = this.uniformsArrayMemberMetadata[prop];
-
-    if (length > 1) {
-      return Array.from(this.uniformsArray.slice(index, length));
-    }
-    return this.uniformsArray[index];
+    return this.uniformsArray.getValueAt(prop);
   }
 
   private proxySetHandler(target, prop, reciever) {
-    const { index } = this.uniformsArrayMemberMetadata[prop];
-
-    if (reciever.byteLength) {
-      reciever = Array.from(reciever);
-    }
-    if (Array.isArray(reciever)) {
-      this.uniformsArray.set(reciever, index);
-    } else {
-      this.uniformsArray.set([reciever], index);
-    }
+    this.uniformsArray.setValueAt(prop, reciever);
     this.bufferNeedsUpdate = true;
 
     if (this.autoUpdate) {
       this.update();
     }
+
     return true;
   }
 

@@ -5,6 +5,7 @@ export { default as ComputeProgram } from "./core/ComputeProgram";
 export { default as Geometry } from "./core/Geometry";
 export { default as UniformsInput } from "./core/UniformsInput";
 export { default as PingPongInput } from "./core/PingPongInput";
+export { default as StructuredFloat32Array } from "./core/StructuredFloat32Array";
 
 export { default as Camera } from "./utils/Camera";
 export { default as TextureLoader } from "./utils/TextureLoader";

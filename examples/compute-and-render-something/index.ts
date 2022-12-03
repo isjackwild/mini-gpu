@@ -7,6 +7,7 @@ import {
   Computer,
   PingPongInput,
   ComputeProgram,
+  StructuredFloat32Array,
 } from "../../src";
 import { TGeometryArgs } from "../../src/core/Geometry";
 
@@ -30,6 +31,11 @@ const animate = () => {
 };
 
 const init = async () => {
+  const sf32 = new StructuredFloat32Array(
+    { foo: 1, bar: 2, baz: [1, 2, 3] },
+    10
+  );
+  console.log(sf32);
   const device = (await Helpers.requestWebGPU()) as GPUDevice;
   renderer = new Renderer(device as GPUDevice, canvas);
   computer = new Computer(device as GPUDevice);
