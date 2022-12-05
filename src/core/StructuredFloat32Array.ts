@@ -34,7 +34,6 @@ class StructuredFloat32Array extends Float32Array {
         value = value instanceof Float32Array ? Array.from(value) : value;
 
         if (Array.isArray(value)) {
-          console.log(value);
           const rowSpace = 4 - (arrayIndex % 4);
 
           switch (rowSpace) {
