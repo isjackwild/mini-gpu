@@ -9,6 +9,38 @@ class StructuredFloat32Array extends Float32Array {
   } = {};
   private stride = 0;
 
+  private static calculatePadding(
+    arrayLength: number,
+    nextItemValue: number | number[]
+  ): number {
+    const rowSpace = 4 - (arrayLength % 4);
+    if (nextItemValue === null || nextItemValue === undefined) {
+      return rowSpace;
+    }
+    if (Array.isArray(nextItemValue)) {
+      switch (rowSpace) {
+        case 1: {
+          return 1;
+        }
+        case 2: {
+          if (nextItemValue.length > 2) {
+            return 2;
+          }
+          break;
+        }
+        case 3: {
+          if (nextItemValue.length === 2) {
+            return 1;
+          } else {
+            return 3;
+          }
+        }
+      }
+    }
+
+    return 0;
+  }
+
   constructor(
     structure: {
       [key: string]:
@@ -20,11 +52,11 @@ class StructuredFloat32Array extends Float32Array {
     const arrayData: number[] = [];
     const metadata = {};
     let stride = 0;
-    const itemsCount = Object.keys(structure).length;
-    const entries = [...Object.entries(structure).entries()];
+    const entries = [...Object.entries(structure)];
 
     for (let i = 0; i < count; i++) {
-      for (let [index, item] of entries) {
+      for (let iE = 0; iE < entries.length; iE++) {
+        const item = entries[iE];
         const key = item[0];
         let value = item[1];
         let arrayIndex = arrayData.length;
@@ -32,54 +64,37 @@ class StructuredFloat32Array extends Float32Array {
         value = value instanceof Function ? value() : value;
         value = value instanceof Float32Array ? Array.from(value) : value;
 
-        if (Array.isArray(value)) {
-          const rowSpace = 4 - (arrayIndex % 4);
-
-          switch (rowSpace) {
-            case 1: {
-              arrayData.push(0); // padding
-              break;
-            }
-            case 2: {
-              if (value.length > 2) {
-                arrayData.push(0, 0); // padding
-              }
-              break;
-            }
-            case 3: {
-              if (value.length === 2) {
-                arrayData.push(0);
-              } else {
-                arrayData.push(0, 0, 0);
-              }
-              break;
-            }
-            default: {
-              break;
-            }
-          }
-          arrayIndex = arrayData.length;
-          arrayData.push(...value);
-        } else {
-          arrayData.push(value);
-        }
-
         metadata[key] = {
           index: arrayIndex,
           length: Array.isArray(value) ? value.length : 1,
         };
 
-        if (index === itemsCount - 1) {
-          const endPadding = 4 - (arrayData.length % 4);
-          if (endPadding % 2 === 1) {
-            for (let i = 0; i < endPadding; i++) {
-              arrayData.push(0);
-            }
-          }
-          if (i === 0) {
-            stride = arrayData.length;
-          }
+        if (Array.isArray(value)) {
+          arrayData.push(...value);
+        } else {
+          arrayData.push(value);
         }
+
+        let nextValue = entries[iE + 1] ? entries[iE + 1][1] : null;
+        if (nextValue) {
+          nextValue = nextValue instanceof Function ? nextValue() : nextValue;
+          nextValue =
+            nextValue instanceof Float32Array
+              ? Array.from(nextValue)
+              : nextValue;
+        }
+
+        const padding = StructuredFloat32Array.calculatePadding(
+          arrayData.length,
+          nextValue as any
+        );
+
+        for (let i = 0; i < padding; i++) {
+          arrayData.push(0);
+        }
+      }
+      if (i === 0) {
+        stride = arrayData.length;
       }
     }
 
