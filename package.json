@@ -20,15 +20,14 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/minigpu.umd.cjs",
-  "module": "./dist/minigpu.js",
+  "main": "./dist/mini-gpu.umd.cjs",
+  "module": "./dist/mini-gpu.js",
   "exports": {
     ".": {
-      "import": "./dist/minigpu.js",
-      "require": "./dist/minigpu.umd.cjs"
+      "import": "./dist/mini-gpu.js",
+      "require": "./dist/mini-gpu.umd.cjs"
     }
   },
-  "types": "dist/types.d.ts",
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
     "dev": "vite",

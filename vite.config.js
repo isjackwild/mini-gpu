@@ -9,7 +9,7 @@ export default defineConfig({
     lib: {
       entry: resolvePath("src/index.ts"),
       name: "miniGPU",
-      fileName: "minigpu",
+      fileName: "mini-gpu",
     },
     rollupOptions: {
       // make sure to externalize deps that shouldn't be bundled
@@ -22,11 +22,11 @@ export default defineConfig({
           "gl-matrix": "glMatrix",
         },
       },
-      plugins: [
-        dts({
-          skipDiagnostics: true,
-        }),
-      ],
+      // plugins: [
+      //   dts({
+      //     skipDiagnostics: true,
+      //   }),
+      // ],
     },
   },
 });

@@ -1,8 +1,9 @@
 const requestWebGPU: () => Promise<false | GPUDevice> = async () => {
   if (!navigator.gpu) {
-    alert(
-      "WebGPU not available! — Use Chrome Canary and enable-unsafe-gpu in flags."
-    );
+    const message =
+      "WebGPU not available! — Use Chrome Canary and enable-unsafe-gpu in flags.";
+    console.error(message);
+    alert(message);
     return false;
   }
   const adapter = await navigator.gpu.requestAdapter();
