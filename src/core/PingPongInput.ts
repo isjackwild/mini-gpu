@@ -50,7 +50,10 @@ class PingPongInput implements ProgramInputInterface {
         GPUBufferUsage.STORAGE |
         GPUBufferUsage.COPY_DST |
         GPUBufferUsage.COPY_SRC,
+      mappedAtCreation: true,
     });
+    new Float32Array(this.bufferB.getMappedRange()).set([...data]);
+    this.bufferB.unmap();
 
     this.stagingBuffer = this.device.createBuffer({
       size,

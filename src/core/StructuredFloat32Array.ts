@@ -15,9 +15,8 @@ class StructuredFloat32Array extends Float32Array {
         | TStructuredFloat32ArrayAcceptedTypes
         | (() => TStructuredFloat32ArrayAcceptedTypes);
     },
-    count = 1
+    public count = 1
   ) {
-    console.log(count);
     const arrayData: number[] = [];
     const metadata = {};
     let stride = 0;
@@ -70,10 +69,12 @@ class StructuredFloat32Array extends Float32Array {
           length: Array.isArray(value) ? value.length : 1,
         };
 
-        if (index === itemsCount - 1 && count > 1) {
+        if (index === itemsCount - 1) {
           const endPadding = 4 - (arrayData.length % 4);
-          for (let i = 0; i < endPadding; i++) {
-            arrayData.push(0);
+          if (endPadding % 2 === 1) {
+            for (let i = 0; i < endPadding; i++) {
+              arrayData.push(0);
+            }
           }
           if (i === 0) {
             stride = arrayData.length;
