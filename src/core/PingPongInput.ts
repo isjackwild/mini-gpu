@@ -1,3 +1,4 @@
+import StructuredFloat32Array from "./StructuredFloat32Array";
 import { ProgramInputInterface } from "./UniformsInput";
 
 class PingPongInput implements ProgramInputInterface {
@@ -13,7 +14,7 @@ class PingPongInput implements ProgramInputInterface {
   private bindGroupSwapIndex = 0;
   private isReadingStagingBuffer = false;
 
-  constructor(private device: GPUDevice, private data: Float32Array) {
+  constructor(private device: GPUDevice, private data: StructuredFloat32Array) {
     this._bindGroupLayout = this.device.createBindGroupLayout({
       entries: [
         {
@@ -111,9 +112,7 @@ class PingPongInput implements ProgramInputInterface {
       name.charAt(0).toUpperCase() + name.slice(1)
     }`;
     return `
-    ${structName} {
-      ...
-    }
+    ${this.data.getWgslChunk(structName)}
 
     @group(${groupIndex}) @binding(0) var<storage, read> input${
       name ? "_" : ""

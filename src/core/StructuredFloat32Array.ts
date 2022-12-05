@@ -5,7 +5,7 @@ export type TStructuredFloat32ArrayAcceptedTypes =
 
 class StructuredFloat32Array extends Float32Array {
   private metadata: {
-    [key: string]: { index: number; length: number };
+    [key: string]: { index: number; length: number; isArray: boolean };
   } = {};
   private stride = 0;
 
@@ -67,6 +67,7 @@ class StructuredFloat32Array extends Float32Array {
         metadata[key] = {
           index: arrayIndex,
           length: Array.isArray(value) ? value.length : 1,
+          isArray: Array.isArray(value),
         };
 
         if (Array.isArray(value)) {
@@ -127,6 +128,23 @@ class StructuredFloat32Array extends Float32Array {
     } else {
       this.set([value], index + arrayIndex * this.stride);
     }
+  }
+
+  public getWgslChunk(name: string = "MyStruct"): string {
+    const members = Object.entries(this.metadata);
+    return `
+    struct ${name} {
+        ${members.reduce((acc, [key, value]) => {
+          // console.log(value.length)
+          const type = value.isArray ? `vec${value.length}<f32>` : "f32";
+          if (acc === "") {
+            return `${key} : ${type},`;
+          } else {
+            return `${acc}
+        ${key} : ${type},`;
+          }
+        }, "")}
+    }`;
   }
 }
 

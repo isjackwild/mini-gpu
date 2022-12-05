@@ -9,7 +9,7 @@ export type TGeometryArgs = {
 
 class Geometry {
   private _vertexCount: number;
-  private _instanceCount: number;
+  // private _instanceCount: number;
 
   private indicesBuffer: GPUBuffer;
   private positionBuffer: GPUBuffer;
@@ -18,7 +18,8 @@ class Geometry {
 
   constructor(
     renderer: Renderer,
-    { indices, normal, position, texcoord }: TGeometryArgs
+    { indices, normal, position, texcoord }: TGeometryArgs,
+    private _instanceCount = 1
   ) {
     this._vertexCount = indices?.length;
 
