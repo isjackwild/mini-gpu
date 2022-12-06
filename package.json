@@ -18,10 +18,10 @@
   "source": "lib/index.ts",
   "type": "module",
   "files": [
-    "dist"
+    "/dist"
   ],
-  "main": "./dist/mini-gpu.umd.cjs",
-  "module": "./dist/mini-gpu.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/mini-gpu.js",
@@ -32,6 +32,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "tsc": "tsc",
+    "tsc:watch": "tsc --watch",
     "preview": "vite preview"
   },
   "devDependencies": {

@@ -1,21 +1,10 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "strict": false,
-    "useDefineForClassFields": true,
     "module": "ESNext",
-    "lib": ["ESNext", "DOM"],
-    "moduleResolution": "Node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "noEmit": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noImplicitReturns": true,
-    "skipLibCheck": true,
-    "types": ["@webgpu/types/dist/index"],
-    "typeRoots": ["./node_modules/@types", "./node_modules/@webgpu"]
+    "target": "ES2015",
+    "declaration": true,
+    "outDir": "./dist",
+    "moduleResolution": "Node"
   },
-  "include": ["src"]
+  "include": ["src/**/*"]
 }
