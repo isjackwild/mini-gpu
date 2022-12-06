@@ -24,7 +24,7 @@ class Geometry {
     this._vertexCount = indices?.length;
 
     this.positionBuffer = renderer.device.createBuffer({
-      size: position.byteLength,
+      size: position.length * Float32Array.BYTES_PER_ELEMENT,
       usage: GPUBufferUsage.VERTEX,
       mappedAtCreation: true,
     });
@@ -32,7 +32,7 @@ class Geometry {
     this.positionBuffer.unmap();
 
     this.normalBuffer = renderer.device.createBuffer({
-      size: normal.byteLength,
+      size: normal.length * Float32Array.BYTES_PER_ELEMENT,
       usage: GPUBufferUsage.VERTEX,
       mappedAtCreation: true,
     });
@@ -40,7 +40,7 @@ class Geometry {
     this.normalBuffer.unmap();
 
     this.texCoordBuffer = renderer.device.createBuffer({
-      size: texcoord.byteLength,
+      size: texcoord.length * Float32Array.BYTES_PER_ELEMENT,
       usage: GPUBufferUsage.VERTEX,
       mappedAtCreation: true,
     });
@@ -48,7 +48,7 @@ class Geometry {
     this.texCoordBuffer.unmap();
 
     this.indicesBuffer = renderer.device.createBuffer({
-      size: indices.byteLength,
+      size: indices.length * Float32Array.BYTES_PER_ELEMENT,
       usage: GPUBufferUsage.INDEX,
       mappedAtCreation: true,
     });
