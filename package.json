@@ -24,11 +24,13 @@
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
     "watch": "tsc --watch",
-    "build": "tsc"
+    "build": "tsc",
+    "docs": "typedoc --out docs src/index.ts"
   },
   "devDependencies": {
     "@types/node": "^18.11.9",
     "@webgpu/types": "^0.1.21",
+    "typedoc": "^0.23.21",
     "typescript": "^4.6.4"
   },
   "dependencies": {
