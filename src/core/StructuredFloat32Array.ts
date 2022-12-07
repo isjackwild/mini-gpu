@@ -14,12 +14,12 @@ class StructuredFloat32Array extends Float32Array {
     nextItemValue: number | number[]
   ): number {
     const rowSpace = 4 - (arrayLength % 4);
-    if (
-      (nextItemValue === null || nextItemValue === undefined) &&
-      rowSpace % 2 === 1
-    ) {
-      return rowSpace;
-    }
+    // if (
+    //   (nextItemValue === null || nextItemValue === undefined) &&
+    //   rowSpace % 2 === 1
+    // ) {
+    //   return rowSpace;
+    // }
     if (Array.isArray(nextItemValue)) {
       switch (rowSpace) {
         case 1: {
@@ -79,7 +79,7 @@ class StructuredFloat32Array extends Float32Array {
           arrayData.push(value);
         }
 
-        let nextValue = entries[iE + 1] ? entries[iE + 1][1] : null;
+        let nextValue = entries[iE + 1] ? entries[iE + 1][1] : entries[0];
         if (nextValue) {
           nextValue = nextValue instanceof Function ? nextValue() : nextValue;
           nextValue =

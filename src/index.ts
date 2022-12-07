@@ -7,6 +7,7 @@ export { default as UniformsInput } from "./core/UniformsInput";
 export { default as PingPongInput } from "./core/PingPongInput";
 export { default as StructuredFloat32Array } from "./core/StructuredFloat32Array";
 
+export { default as Clock } from "./utils/Clock";
 export { default as Camera } from "./utils/Camera";
 export { default as TextureLoader } from "./utils/TextureLoader";
 export { default as OrbitControls } from "./utils/OrbitControls";
