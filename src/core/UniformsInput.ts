@@ -70,14 +70,17 @@ class UniformsInput implements ProgramInputInterface {
 
   private createBindGroup(): void {
     const entriesLayout: GPUBindGroupLayoutEntry[] = [];
-    entriesLayout.push({
-      binding: entriesLayout.length,
-      visibility:
-        GPUShaderStage.VERTEX |
-        GPUShaderStage.FRAGMENT |
-        GPUShaderStage.COMPUTE,
-      buffer: { type: "uniform" },
-    });
+
+    if (this.bufferMembers.length) {
+      entriesLayout.push({
+        binding: entriesLayout.length,
+        visibility:
+          GPUShaderStage.VERTEX |
+          GPUShaderStage.FRAGMENT |
+          GPUShaderStage.COMPUTE,
+        buffer: { type: "uniform" },
+      });
+    }
 
     this.textures.forEach(({ value }) => {
       entriesLayout.push({
@@ -107,12 +110,14 @@ class UniformsInput implements ProgramInputInterface {
     });
 
     const entries: GPUBindGroupEntry[] = [];
-    entries.push({
-      binding: 0,
-      resource: {
-        buffer: this.uniformsBuffer,
-      },
-    });
+    if (this.bufferMembers.length) {
+      entries.push({
+        binding: 0,
+        resource: {
+          buffer: this.uniformsBuffer,
+        },
+      });
+    }
     this.textures.forEach(({ value }) => {
       entries.push({
         binding: entries.length,
@@ -131,6 +136,8 @@ class UniformsInput implements ProgramInputInterface {
       layout: this.bindGroupLayout,
       entries,
     });
+
+    console.log(entries);
   }
 
   private proxyGetHandler(target, prop) {

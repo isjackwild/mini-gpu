@@ -10,6 +10,7 @@ class Renderer {
   private renderPassDescriptor: GPURenderPassDescriptor;
   private _pixelRatio = window.devicePixelRatio;
   private presentationSize = { width: 0, height: 0 };
+  private _renderTexture?: GPUTexture;
 
   constructor(
     public device: GPUDevice,
@@ -22,6 +23,7 @@ class Renderer {
     this.canvas.height = this.presentationSize.height;
     this.ctx = this.canvas.getContext("webgpu") as GPUCanvasContext;
     this.presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+    console.log(this.presentationFormat);
 
     this.ctx.configure({
       device: this.device,
@@ -62,10 +64,16 @@ class Renderer {
   }
 
   public get width(): number {
+    if (!!this.renderTexture) {
+      return this.renderTexture.width;
+    }
     return this.presentationSize.width;
   }
 
   public get height(): number {
+    if (!!this.renderTexture) {
+      return this.renderTexture.height;
+    }
     return this.presentationSize.height;
   }
 
@@ -78,7 +86,38 @@ class Renderer {
     this.resize();
   }
 
+  public set renderTexture(texture: GPUTexture | null) {
+    const lastWidth = this.width;
+    const lastHeight = this.height;
+    this._renderTexture = texture;
+
+    if (texture) {
+      this.renderPassDescriptor.colorAttachments[0].view =
+        this.renderTexture.createView();
+    }
+
+    if (this.width !== lastWidth || this.height !== lastHeight) {
+      const depthTexture = this.device.createTexture({
+        size: {
+          width: this.width,
+          height: this.height,
+          depthOrArrayLayers: 1,
+        },
+        format: this.depthFormat,
+        usage: GPUTextureUsage.RENDER_ATTACHMENT,
+      });
+      this.renderPassDescriptor.depthStencilAttachment.view =
+        depthTexture.createView();
+    }
+  }
+
+  public get renderTexture(): GPUTexture {
+    return this._renderTexture;
+  }
+
   public resize(width?: number, height?: number): void {
+    if (!!this.renderTexture) return;
+
     const newWidth = (width || this.canvas.clientWidth) * this.pixelRatio;
     const newHeight = (height || this.canvas.clientHeight) * this.pixelRatio;
 
@@ -115,15 +154,16 @@ class Renderer {
   }
 
   public render(renderable: RenderableInterface): void {
-    this.renderPassDescriptor.colorAttachments[0].view = this.ctx
-      .getCurrentTexture()
-      .createView();
+    if (!this.renderTexture) {
+      this.renderPassDescriptor.colorAttachments[0].view = this.ctx
+        .getCurrentTexture()
+        .createView();
+    }
 
     const commandEncoder = this.device.createCommandEncoder();
     const renderPass = commandEncoder.beginRenderPass(
       this.renderPassDescriptor
     );
-
     renderable.getCommands(renderPass);
 
     renderPass.end();
@@ -132,9 +172,11 @@ class Renderer {
   }
 
   public renderAll() {
-    this.renderPassDescriptor.colorAttachments[0].view = this.ctx
-      .getCurrentTexture()
-      .createView();
+    if (!this.renderTexture) {
+      this.renderPassDescriptor.colorAttachments[0].view = this.ctx
+        .getCurrentTexture()
+        .createView();
+    }
 
     const commandEncoder = this.device.createCommandEncoder();
     const renderPass = commandEncoder.beginRenderPass(
