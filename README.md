@@ -31,15 +31,7 @@ Import the bits you need
 ```
 import {
   Renderer,
-  Computer,
-  RenderProgram,
-  ComputeProgram,
-  Geometry,
-  UniformsInput,
-  PingPongBufferInput,
-  OrbitControls,
-  Camera,
-  Helpers,
+  ...
 } from "mini-gpu";
 ```
 
@@ -82,6 +74,10 @@ TODO
 ## Structured Array
 
 TODO
+
+# Class reference
+
+The Class reference can be found [here](https://isjackwild.github.io/mini-gpu/)
 
 # Examples
 
@@ -539,7 +535,3 @@ const init = async () => {
 
 init();
 ```
-
-# Class reference
-
-TODO
