@@ -1,6 +1,6 @@
 import { ComputableInterface } from "./Computer";
 import Program from "./Program";
-import { ProgramInputInterface } from "./UniformsInput";
+import { ProgramInputInterface } from "./Program";
 
 // TODO — How to update a uniforms group and swap with another
 class ComputeProgram extends Program implements ComputableInterface {

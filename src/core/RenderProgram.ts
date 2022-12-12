@@ -1,7 +1,7 @@
 import Geometry from "./Geometry";
 import Program from "./Program";
 import Renderer, { RenderableInterface } from "./Renderer";
-import Uniforms, { ProgramInputInterface } from "./UniformsInput";
+import { ProgramInputInterface } from "./Program";
 
 // TODO — How to update a uniforms group and swap with another
 class RenderProgram extends Program implements RenderableInterface {

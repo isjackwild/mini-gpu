@@ -36,7 +36,7 @@ import {
   ComputeProgram,
   Geometry,
   UniformsInput,
-  PingPongInput,
+  PingPongBufferInput,
   OrbitControls,
   Camera,
   Helpers,
@@ -49,7 +49,7 @@ Mini GPU supports both render pipelines and compute pipelines, and they follow a
 
 0. Get access to your machines GPU device.
 1. Create a `Renderer` or `Computer` to run your programs.
-2. Create one or multiple program inputs. There are currently two supported input types: `UniformsInput` (which creates a set of... wait for it... uniforms) and `PingPongInput` (which creates a swappable pingpong buffer for doing [GPGPU](https://en.wikipedia.org/wiki/General-purpose_computing_on_graphics_processing_units)).
+2. Create one or multiple program inputs. There are currently two supported input types: `UniformsInput` (which creates a set of... wait for it... uniforms) and `PingPongBufferInput` (which creates a swappable pingpong buffer for doing [GPGPU](https://en.wikipedia.org/wiki/General-purpose_computing_on_graphics_processing_units)).
 3. For Render pipelines, create a `Geometry` by passing in indices, positions, normals and texcoords (I use the awesome [twgl.js](https://twgljs.org/) for this).
 4. Create a `RenderProgram` or a `ComputeProgram` with your WGSL shader code and your program inputs.
 5. Run the programs with the `Renderer` or `Computer`.
@@ -216,14 +216,14 @@ import {
   Computer,
   ComputeProgram,
   UniformsInput,
-  PingPongInput,
+  PingPongBufferInput,
   Helpers,
 } from "mini-gpu";
 
 import computeShader from "./compute.wgsl?raw";
 
 let computer: Computer;
-let uniforms: UniformsInput, pingPong: PingPongInput;
+let uniforms: UniformsInput, pingPong: PingPongBufferInput;
 
 const readPingPong = async () => {
   const data = await pingPong.read();
@@ -246,7 +246,7 @@ const init = async () => {
   uniforms = new UniformsInput(device as GPUDevice, {
     u_elapsed_time: 0,
   });
-  pingPong = new PingPongInput(
+  pingPong = new PingPongBufferInput(
     device as GPUDevice,
     new Float32Array([0, 1, 2, 3, 4])
   );
@@ -356,7 +356,7 @@ import {
   UniformsInput,
   Helpers,
   Computer,
-  PingPongInput,
+  PingPongBufferInput,
   ComputeProgram,
 } from "mini-gpu";
 import { TGeometryArgs } from "../../src/core/Geometry";
@@ -370,7 +370,7 @@ import computeShader from "./compute.wgsl?raw";
 const canvas = document.querySelector("canvas") as HTMLCanvasElement;
 
 let renderer: Renderer, computer: Computer;
-let uniforms: UniformsInput, pingPong: PingPongInput;
+let uniforms: UniformsInput, pingPong: PingPongBufferInput;
 
 const animate = () => {
   uniforms.member.u_elapsed_time = uniforms.member.u_elapsed_time + 0.01;
@@ -385,7 +385,7 @@ const init = async () => {
   renderer = new Renderer(device as GPUDevice, canvas);
   computer = new Computer(device as GPUDevice);
 
-  pingPong = new PingPongInput(device, new Float32Array([0, 0, 0]));
+  pingPong = new PingPongBufferInput(device, new Float32Array([0, 0, 0]));
   uniforms = new UniformsInput(device as GPUDevice, {
     u_elapsed_time: 0,
   });

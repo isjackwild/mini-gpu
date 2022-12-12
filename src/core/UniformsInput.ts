@@ -1,13 +1,7 @@
 import StructuredFloat32Array, {
   TStructuredFloat32ArrayAcceptedTypes,
 } from "./StructuredFloat32Array";
-
-export interface ProgramInputInterface {
-  bindGroupLayout: GPUBindGroupLayout;
-  bindGroup: GPUBindGroup;
-  update(): void;
-  getWgslChunk(groupIndex: string | number, name: string): string;
-}
+import { ProgramInputInterface } from "./Program";
 
 class UniformsInput implements ProgramInputInterface {
   private _member: ProxyConstructor;
@@ -136,8 +130,6 @@ class UniformsInput implements ProgramInputInterface {
       layout: this.bindGroupLayout,
       entries,
     });
-
-    console.log(entries);
   }
 
   private proxyGetHandler(target, prop) {

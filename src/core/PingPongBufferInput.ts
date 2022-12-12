@@ -1,7 +1,7 @@
 import StructuredFloat32Array from "./StructuredFloat32Array";
-import { ProgramInputInterface } from "./UniformsInput";
+import { ProgramInputInterface } from "./Program";
 
-class PingPongInput implements ProgramInputInterface {
+class PingPongBufferInput implements ProgramInputInterface {
   private _bindGroupLayout: GPUBindGroupLayout;
 
   private bufferA: GPUBuffer;
@@ -15,24 +15,6 @@ class PingPongInput implements ProgramInputInterface {
   private isReadingStagingBuffer = false;
 
   constructor(private device: GPUDevice, private data: StructuredFloat32Array) {
-    this._bindGroupLayout = this.device.createBindGroupLayout({
-      entries: [
-        {
-          binding: 0,
-          visibility:
-            GPUShaderStage.COMPUTE |
-            GPUShaderStage.FRAGMENT |
-            GPUShaderStage.VERTEX,
-          buffer: { type: "read-only-storage" },
-        },
-        {
-          binding: 1,
-          visibility: GPUShaderStage.COMPUTE,
-          buffer: { type: "storage" },
-        },
-      ],
-    });
-
     const size = data.byteLength;
     this.bufferA = this.device.createBuffer({
       size,
@@ -59,6 +41,24 @@ class PingPongInput implements ProgramInputInterface {
     this.stagingBuffer = this.device.createBuffer({
       size,
       usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST,
+    });
+
+    this._bindGroupLayout = this.device.createBindGroupLayout({
+      entries: [
+        {
+          binding: 0,
+          visibility:
+            GPUShaderStage.COMPUTE |
+            GPUShaderStage.FRAGMENT |
+            GPUShaderStage.VERTEX,
+          buffer: { type: "read-only-storage" },
+        },
+        {
+          binding: 1,
+          visibility: GPUShaderStage.COMPUTE,
+          buffer: { type: "storage" },
+        },
+      ],
     });
 
     this.bindGroupA = this.device.createBindGroup({
@@ -100,6 +100,10 @@ class PingPongInput implements ProgramInputInterface {
     return this.bindGroupSwapIndex % 2 === 0 ? this.bufferA : this.bufferB;
   }
 
+  public get backBuffer(): GPUBuffer {
+    return this.bindGroupSwapIndex % 2 === 1 ? this.bufferA : this.bufferB;
+  }
+
   public step(): void {
     this.bindGroupSwapIndex++;
   }
@@ -122,8 +126,6 @@ class PingPongInput implements ProgramInputInterface {
     }${name} : array<${structName}>;
     `;
   }
-
-  public update() {}
 
   public async read(): Promise<Float32Array | null> {
     if (this.isReadingStagingBuffer) return null;
@@ -156,4 +158,4 @@ class PingPongInput implements ProgramInputInterface {
   }
 }
 
-export default PingPongInput;
+export default PingPongBufferInput;

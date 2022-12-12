@@ -1,4 +1,9 @@
-import { ProgramInputInterface } from "./UniformsInput";
+export interface ProgramInputInterface {
+  bindGroupLayout: GPUBindGroupLayout;
+  bindGroup: GPUBindGroup;
+  update?(): void;
+  getWgslChunk(groupIndex: string | number, name: string): string;
+}
 
 abstract class Program {
   protected pipeline: GPURenderPipeline | GPUComputePipeline;
@@ -17,7 +22,9 @@ abstract class Program {
     pass: GPUComputePassEncoder | GPURenderPassEncoder
   ): void {
     this.inputsKeys.forEach((key, index) => {
-      this.inputs[key].update();
+      if (this.inputs[key].update) {
+        this.inputs[key].update();
+      }
       pass.setBindGroup(index, this.inputs[key].bindGroup);
     });
   }
