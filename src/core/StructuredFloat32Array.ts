@@ -3,6 +3,12 @@ export type TStructuredFloat32ArrayAcceptedTypes =
   | number[]
   | Float32Array;
 
+export type TStructuredFloat32ArrayStructure = {
+  [key: string]:
+    | TStructuredFloat32ArrayAcceptedTypes
+    | (() => TStructuredFloat32ArrayAcceptedTypes);
+};
+
 class StructuredFloat32Array extends Float32Array {
   private metadata: {
     [key: string]: { index: number; length: number; isArray: boolean };
@@ -14,12 +20,6 @@ class StructuredFloat32Array extends Float32Array {
     nextItemValue: number | number[]
   ): number {
     const rowSpace = 4 - (arrayLength % 4);
-    // if (
-    //   (nextItemValue === null || nextItemValue === undefined) &&
-    //   rowSpace % 2 === 1
-    // ) {
-    //   return rowSpace;
-    // }
     if (Array.isArray(nextItemValue)) {
       switch (rowSpace) {
         case 1: {
@@ -45,16 +45,20 @@ class StructuredFloat32Array extends Float32Array {
   }
 
   constructor(
-    structure: {
-      [key: string]:
-        | TStructuredFloat32ArrayAcceptedTypes
-        | (() => TStructuredFloat32ArrayAcceptedTypes);
-    },
+    _structure:
+      | TStructuredFloat32ArrayStructure
+      | (() => TStructuredFloat32ArrayStructure),
     public count = 1
   ) {
     const arrayData: number[] = [];
     const metadata = {};
     let stride = 0;
+
+    let structure = _structure;
+    if (typeof structure == "function") {
+      structure = structure();
+    }
+
     const entries = [...Object.entries(structure)];
 
     for (let i = 0; i < count; i++) {
