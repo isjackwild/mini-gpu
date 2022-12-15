@@ -77,6 +77,7 @@ class RenderProgram extends Program implements RenderableInterface {
     renderPass.setPipeline(this.pipeline);
     this.geometry.setVertexBuffers(renderPass);
     this.setBindGroups(renderPass);
+
     renderPass.drawIndexed(
       this.geometry.vertexCount,
       this.geometry.instanceCount,

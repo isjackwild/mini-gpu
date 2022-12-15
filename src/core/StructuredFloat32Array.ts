@@ -62,13 +62,15 @@ class StructuredFloat32Array extends Float32Array {
     let stride = 0;
 
     let structure = _structure;
-    if (typeof structure == "function") {
-      structure = structure();
+    let entries;
+    if (typeof structure !== "function") {
+      entries = [...Object.entries(structure)];
     }
 
-    const entries = [...Object.entries(structure)];
-
     for (let i = 0; i < count; i++) {
+      if (typeof structure === "function") {
+        entries = [...Object.entries(structure())];
+      }
       for (let iE = 0; iE < entries.length; iE++) {
         const item = entries[iE];
         const key = item[0];
@@ -93,7 +95,7 @@ class StructuredFloat32Array extends Float32Array {
         let nextValue = entries[iE + 1]
           ? entries[iE + 1][1]
           : count > 1
-          ? entries[0]
+          ? entries[0][1]
           : null;
 
         if (nextValue) {
