@@ -14,7 +14,10 @@ class PingPongBufferInput implements ProgramInputInterface {
   private bindGroupSwapIndex = 0;
   private isReadingStagingBuffer = false;
 
-  constructor(private device: GPUDevice, private data: StructuredFloat32Array) {
+  constructor(
+    private device: GPUDevice,
+    private data: StructuredFloat32Array | Float32Array
+  ) {
     const size = data.byteLength;
     this.bufferA = this.device.createBuffer({
       size,
@@ -112,19 +115,30 @@ class PingPongBufferInput implements ProgramInputInterface {
     groupIndex: string | number = "[REPLACE_WITH_GROUP_INDEX]",
     name: string = ""
   ): string {
-    const structName = `PingPong${
-      name.charAt(0).toUpperCase() + name.slice(1)
-    }`;
-    return `
-    ${this.data.getWgslChunk(structName)}
-
-    @group(${groupIndex}) @binding(0) var<storage, read> input${
-      name ? "_" : ""
-    }${name} : array<${structName}>;
-    @group(${groupIndex}) @binding(1) var<storage, read_write> output${
-      name ? "_" : ""
-    }${name} : array<${structName}>;
-    `;
+    if (this.data instanceof StructuredFloat32Array) {
+      const structName = `PingPong${
+        name.charAt(0).toUpperCase() + name.slice(1)
+      }`;
+      return `
+      ${this.data.getWgslChunk(structName)}
+  
+      @group(${groupIndex}) @binding(0) var<storage, read> input${
+        name ? "_" : ""
+      }${name} : array<${structName}>;
+      @group(${groupIndex}) @binding(1) var<storage, read_write> output${
+        name ? "_" : ""
+      }${name} : array<${structName}>;
+      `;
+    } else {
+      return `
+      @group(${groupIndex}) @binding(0) var<storage, read> input${
+        name ? "_" : ""
+      }${name} : array<[REPLACE_WITH_TYPE]>;
+      @group(${groupIndex}) @binding(1) var<storage, read_write> output${
+        name ? "_" : ""
+      }${name} : array<[REPLACE_WITH_TYPE]>;
+      `;
+    }
   }
 
   public async read(): Promise<Float32Array | null> {

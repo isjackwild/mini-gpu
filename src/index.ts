@@ -4,6 +4,7 @@ export { default as RenderProgram } from "./core/RenderProgram";
 export { default as ComputeProgram } from "./core/ComputeProgram";
 export { default as Geometry } from "./core/Geometry";
 export { default as UniformsInput } from "./core/UniformsInput";
+export { default as BufferInput } from "./core/BufferInput";
 export { default as PingPongBufferInput } from "./core/PingPongBufferInput";
 export { default as PingPongTextureInput } from "./core/PingPongTextureInput";
 export { default as StructuredFloat32Array } from "./core/StructuredFloat32Array";

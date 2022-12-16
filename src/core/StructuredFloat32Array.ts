@@ -20,10 +20,7 @@ class StructuredFloat32Array extends Float32Array {
     nextItemValue: number | number[]
   ): number {
     const rowSpace = 4 - (arrayLength % 4);
-    if (
-      (nextItemValue === null || nextItemValue === undefined) &&
-      rowSpace % 2 === 1
-    ) {
+    if (nextItemValue === null || nextItemValue === undefined) {
       return rowSpace;
     }
 
@@ -54,7 +51,7 @@ class StructuredFloat32Array extends Float32Array {
   constructor(
     _structure:
       | TStructuredFloat32ArrayStructure
-      | (() => TStructuredFloat32ArrayStructure),
+      | ((index: number) => TStructuredFloat32ArrayStructure),
     public count = 1
   ) {
     const arrayData: number[] = [];
@@ -69,7 +66,7 @@ class StructuredFloat32Array extends Float32Array {
 
     for (let i = 0; i < count; i++) {
       if (typeof structure === "function") {
-        entries = [...Object.entries(structure())];
+        entries = [...Object.entries(structure(i))];
       }
       for (let iE = 0; iE < entries.length; iE++) {
         const item = entries[iE];
@@ -92,11 +89,7 @@ class StructuredFloat32Array extends Float32Array {
           arrayData.push(value);
         }
 
-        let nextValue = entries[iE + 1]
-          ? entries[iE + 1][1]
-          : count > 1
-          ? entries[0][1]
-          : null;
+        let nextValue = entries[iE + 1] ? entries[iE + 1][1] : null;
 
         if (nextValue) {
           nextValue = nextValue instanceof Function ? nextValue() : nextValue;

@@ -9,8 +9,6 @@ export type TGeometryArgs = {
 
 class Geometry {
   private _vertexCount: number;
-  // private _instanceCount: number;
-
   private indicesBuffer: GPUBuffer;
   private positionBuffer: GPUBuffer;
   private normalBuffer: GPUBuffer;
