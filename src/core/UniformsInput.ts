@@ -137,8 +137,16 @@ class UniformsInput implements ProgramInputInterface {
   }
 
   private proxySetHandler(target, prop, reciever) {
-    this.uniformsArray.setValueAt(prop, reciever);
-    this.bufferNeedsUpdate = true;
+    if (reciever instanceof GPUTexture) {
+      const item = this.textures.find(
+        ({ key }: { key: string }) => key === prop
+      );
+      item.value = reciever;
+      this.createBindGroup();
+    } else {
+      this.uniformsArray.setValueAt(prop, reciever);
+      this.bufferNeedsUpdate = true;
+    }
 
     if (this.autoUpdate) {
       this.update();
