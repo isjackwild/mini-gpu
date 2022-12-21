@@ -153,7 +153,9 @@ class Renderer {
     this.items.delete(renderable);
   }
 
-  public render(renderable: RenderableInterface): void {
+  public render(
+    renderables: RenderableInterface | RenderableInterface[]
+  ): void {
     if (!this.renderTexture) {
       this.renderPassDescriptor.colorAttachments[0].view = this.ctx
         .getCurrentTexture()
@@ -164,7 +166,12 @@ class Renderer {
     const renderPass = commandEncoder.beginRenderPass(
       this.renderPassDescriptor
     );
-    renderable.getCommands(renderPass);
+
+    if (Array.isArray(renderables)) {
+      renderables.forEach((renderable) => renderable.getCommands(renderPass));
+    } else {
+      renderables.getCommands(renderPass);
+    }
 
     renderPass.end();
     const commands = commandEncoder.finish();

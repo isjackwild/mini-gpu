@@ -20,6 +20,7 @@ class StructuredFloat32Array extends Float32Array {
     nextItemValue: number | number[]
   ): number {
     const rowSpace = 4 - (arrayLength % 4);
+    if (rowSpace === 4) return 0;
     if (nextItemValue === null || nextItemValue === undefined) {
       return rowSpace;
     }

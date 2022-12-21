@@ -12,9 +12,19 @@ class RenderProgram extends Program implements RenderableInterface {
     public shader: string,
     private geometry: Geometry,
     protected _inputs: { [key: string]: ProgramInputInterface },
-    wireframe = false
+    options: {
+      wireframe?: boolean;
+      depthWrite?: boolean;
+      depthCompare?: GPUCompareFunction;
+    } = {}
   ) {
     super();
+    options = {
+      wireframe: false,
+      depthWrite: true,
+      depthCompare: "less",
+      ...options,
+    };
     this.inputsKeys = Object.keys(this.inputs);
     const shaderModule = renderer.device.createShaderModule({
       code: this.shader,
@@ -31,12 +41,12 @@ class RenderProgram extends Program implements RenderableInterface {
       vertex: vertexState,
       fragment: fragmentState,
       primitive: {
-        topology: wireframe ? "line-list" : "triangle-list",
+        topology: options.wireframe ? "line-list" : "triangle-list",
       },
       depthStencil: {
         format: renderer.depthFormat,
-        depthWriteEnabled: true,
-        depthCompare: "less",
+        depthWriteEnabled: options.depthWrite,
+        depthCompare: options.depthCompare,
       },
     });
   }
