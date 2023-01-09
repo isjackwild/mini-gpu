@@ -133,6 +133,12 @@ class UniformsInput implements ProgramInputInterface {
   }
 
   private proxyGetHandler(target, prop) {
+    const texture = this.textures.find(
+      ({ key }: { key: string }) => key === prop
+    );
+    if (texture) {
+      return texture.value;
+    }
     return this.uniformsArray.getValueAt(prop);
   }
 
