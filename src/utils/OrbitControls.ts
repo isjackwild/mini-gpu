@@ -253,6 +253,7 @@ class OrbitControls {
 
     const { x, y, z } = this.spherical.toCathesian();
     vec3.set(this.eye, x, y, z);
+    vec3.add(this.eye, this.eye, this.target);
     mat4.lookAt(
       this.camera.transformationMatrix,
       this.eye,
