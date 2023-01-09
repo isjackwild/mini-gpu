@@ -8,6 +8,7 @@ type TOptions = {
   autoRotateSpeed?: number;
   enableDamping?: boolean;
   dampingFactor?: number;
+  enableDolly?: boolean;
 };
 
 type TSpherical = {
@@ -83,6 +84,8 @@ class OrbitControls {
   public minAzimuthAngle = -Infinity;
   public maxAzimuthAngle = Infinity;
 
+  public enableDolly = true;
+
   public rotateSpeed = 0.5;
 
   public autoRotate = false;
@@ -105,6 +108,7 @@ class OrbitControls {
     this.onPointerMove = this.onPointerMove.bind(this);
     this.onPointerUp = this.onPointerUp.bind(this);
     this.onPointerCancel = this.onPointerCancel.bind(this);
+    this.onWheel = this.onWheel.bind(this);
 
     const {
       target,
@@ -140,6 +144,7 @@ class OrbitControls {
     this.domElement.addEventListener("pointerup", this.onPointerUp);
     this.domElement.addEventListener("pointercancel", this.onPointerCancel);
     this.domElement.addEventListener("pointerleave", this.onPointerCancel);
+    this.domElement.addEventListener("wheel", this.onWheel);
   }
 
   private removeEventListeners(): void {
@@ -148,6 +153,11 @@ class OrbitControls {
     this.domElement.removeEventListener("pointerup", this.onPointerUp);
     this.domElement.removeEventListener("pointercancel", this.onPointerCancel);
     this.domElement.removeEventListener("pointerleave", this.onPointerCancel);
+    this.domElement.removeEventListener("wheel", this.onWheel);
+  }
+
+  private onWheel(e: WheelEvent) {
+    this.dolly(e.deltaY);
   }
 
   private onPointerDown(event: PointerEvent) {
@@ -205,6 +215,10 @@ class OrbitControls {
     this.sphericalDelta.theta += angle;
   }
 
+  public dolly(distance: number) {
+    this.sphericalDelta.rho += distance;
+  }
+
   public update(delta: number = 16.66) {
     if (this.autoRotate && !this.isPointerDown) {
       this.rotateAzimuth(delta * -0.0001 * this.autoRotateSpeed);
@@ -213,14 +227,20 @@ class OrbitControls {
     if (this.enableDamping) {
       this.spherical.theta += this.sphericalDelta.theta * this.dampingFactor;
       this.spherical.phi += this.sphericalDelta.phi * this.dampingFactor;
+      this.spherical.rho += this.sphericalDelta.rho * this.dampingFactor;
       this.sphericalDelta.theta *= 1 - this.dampingFactor;
       this.sphericalDelta.phi *= 1 - this.dampingFactor;
+      this.sphericalDelta.rho *= 1 - this.dampingFactor;
     } else {
       this.spherical.phi += this.sphericalDelta.phi;
       this.spherical.theta += this.sphericalDelta.theta;
+      this.spherical.rho += this.sphericalDelta.rho;
       this.sphericalDelta.phi = 0;
       this.sphericalDelta.theta = 0;
+      this.sphericalDelta.rho = 0;
     }
+
+    this.spherical.rho = Math.max(this.spherical.rho, 0.01);
 
     this.spherical.phi = Math.min(
       Math.max(this.spherical.phi, this.minPolarAngle),
