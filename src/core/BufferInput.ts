@@ -10,7 +10,7 @@ class BufferInput implements ProgramInputInterface {
 
   constructor(
     private device: GPUDevice,
-    data:
+    private data:
       | StructuredFloat32Array
       | Float32Array
       | (StructuredFloat32Array | Float32Array)[]
@@ -63,6 +63,22 @@ class BufferInput implements ProgramInputInterface {
     });
   }
 
+  public get length(): number | number[] {
+    if (Array.isArray(this.data)) {
+      return this.data.map((item) => item.length);
+    } else {
+      return this.data.length;
+    }
+  }
+
+  public get byteLength(): number | number[] {
+    if (Array.isArray(this.data)) {
+      return this.data.map((item) => item.byteLength);
+    } else {
+      return this.data.byteLength;
+    }
+  }
+
   public get bindGroupLayout(): GPUBindGroupLayout {
     return this._bindGroupLayout;
   }
@@ -75,14 +91,51 @@ class BufferInput implements ProgramInputInterface {
     groupIndex: string | number = "[REPLACE_WITH_GROUP_INDEX]",
     name: string = ""
   ): string {
-    return this.buffers.reduce((acc, item, index) => {
-      return `
-      ${acc}
-      @group(${groupIndex}) @binding(${index}) var<storage, read> input${
-        name ? "_" : ""
-      }${name}_${index} : array<[REPLACE_WITH_TYPE]>;
-      `;
-    }, ``);
+    if (Array.isArray(this.data)) {
+      return this.data.reduce((acc, item, index) => {
+        return `
+        ${acc}
+        ${
+          item instanceof StructuredFloat32Array
+            ? item.getWgslChunk(
+                `MyStruct_${index}${
+                  name.charAt(0).toUpperCase() + name.slice(1)
+                }`
+              )
+            : ``
+        }
+
+        @group(${groupIndex}) @binding(${index}) var<storage, read> input${
+          name ? "_" : ""
+        }${name}_${index} : array<[REPLACE_WITH_TYPE]>;
+        `;
+      }, ``);
+    } else {
+      if (this.data instanceof StructuredFloat32Array) {
+        const structName = `MyStruct${
+          name.charAt(0).toUpperCase() + name.slice(1)
+        }`;
+        return `
+    ${this.data.getWgslChunk(structName)}
+
+    @group(${groupIndex}) @binding(0) var<storage, read> input${
+          name ? "_" : ""
+        }${name} : array<${structName}>;
+    @group(${groupIndex}) @binding(1) var<storage, read_write> output${
+          name ? "_" : ""
+        }${name} : array<${structName}>;
+    `;
+      } else {
+        return `
+    @group(${groupIndex}) @binding(0) var<storage, read> input${
+          name ? "_" : ""
+        }${name} : array<[REPLACE_WITH_TYPE]>;
+    @group(${groupIndex}) @binding(1) var<storage, read_write> output${
+          name ? "_" : ""
+        }${name} : array<[REPLACE_WITH_TYPE]>;
+    `;
+      }
+    }
   }
 
   public async read(index = 0): Promise<Float32Array | null> {
