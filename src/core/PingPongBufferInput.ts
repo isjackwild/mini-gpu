@@ -122,19 +122,19 @@ class PingPongBufferInput implements ProgramInputInterface {
       return `
       ${this.data.getWgslChunk(structName)}
   
-      @group(${groupIndex}) @binding(0) var<storage, read> input${
+    @group(${groupIndex}) @binding(0) var<storage, read> input${
         name ? "_" : ""
       }${name} : array<${structName}>;
-      @group(${groupIndex}) @binding(1) var<storage, read_write> output${
+    @group(${groupIndex}) @binding(1) var<storage, read_write> output${
         name ? "_" : ""
       }${name} : array<${structName}>;
       `;
     } else {
       return `
-      @group(${groupIndex}) @binding(0) var<storage, read> input${
+    @group(${groupIndex}) @binding(0) var<storage, read> input${
         name ? "_" : ""
       }${name} : array<[REPLACE_WITH_TYPE]>;
-      @group(${groupIndex}) @binding(1) var<storage, read_write> output${
+    @group(${groupIndex}) @binding(1) var<storage, read_write> output${
         name ? "_" : ""
       }${name} : array<[REPLACE_WITH_TYPE]>;
       `;
