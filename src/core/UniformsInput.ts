@@ -181,17 +181,7 @@ class UniformsInput implements ProgramInputInterface {
       name.charAt(0).toUpperCase() + name.slice(1)
     }`;
     return `
-    struct ${structName} {
-        ${this.bufferMembers.reduce((acc, { key, value }) => {
-          const type = Array.isArray(value) ? `vec${value.length}<f32>` : "f32";
-          if (acc === "") {
-            return `${key} : ${type},`;
-          } else {
-            return `${acc}
-        ${key} : ${type},`;
-          }
-        }, "")}
-    }
+    ${this.uniformsArray.getWgslChunk(structName)}
 
     @group(${groupIndex}) @binding(0) var<uniform> uniforms${
       name ? "_" : ""

@@ -9,9 +9,15 @@ export type TStructuredFloat32ArrayStructure = {
     | (() => TStructuredFloat32ArrayAcceptedTypes);
 };
 
+type TStructuredFloat32ArrayMemberMeta = {
+  index: number;
+  length: number;
+  isArray: boolean;
+};
+
 class StructuredFloat32Array extends Float32Array {
   private metadata: {
-    [key: string]: { index: number; length: number; isArray: boolean };
+    [key: string]: TStructuredFloat32ArrayMemberMeta;
   } = {};
   private stride = 0;
 
@@ -47,6 +53,42 @@ class StructuredFloat32Array extends Float32Array {
     }
 
     return 0;
+  }
+
+  private static inferMemberType(member: TStructuredFloat32ArrayMemberMeta) {
+    const possibleTypes = [];
+    if (!member.isArray) {
+      return "f32";
+    } else {
+      if (member.length <= 4) {
+        possibleTypes.push(`vec${member.length}<f32>`);
+      }
+      if (member.length == 4) {
+        possibleTypes.push("mat2x2<f32>");
+      }
+      if (member.length == 6) {
+        possibleTypes.push("mat2x3<f32>");
+        possibleTypes.push("mat3x2<f32>");
+      }
+      if (member.length == 8) {
+        possibleTypes.push("mat2x4<f32>");
+        possibleTypes.push("mat4x2<f32>");
+      }
+      if (member.length == 9) {
+        possibleTypes.push("mat3x3<f32>");
+      }
+      if (member.length == 12) {
+        possibleTypes.push("mat3x4<f32>");
+        possibleTypes.push("mat4x3<f32>");
+      }
+      if (member.length == 16) {
+        possibleTypes.push("mat4x4<f32>");
+      }
+
+      possibleTypes.push(`array<T, N>`);
+    }
+
+    return `[${possibleTypes.join(" OR ")}]`;
   }
 
   constructor(
@@ -150,13 +192,11 @@ class StructuredFloat32Array extends Float32Array {
     return `
     struct ${name} {
         ${members.reduce((acc, [key, value]) => {
-          // console.log(value.length)
-          const type = value.isArray ? `vec${value.length}<f32>` : "f32";
           if (acc === "") {
-            return `${key} : ${type},`;
+            return `${key} : ${StructuredFloat32Array.inferMemberType(value)},`;
           } else {
             return `${acc}
-        ${key} : ${type},`;
+        ${key} : ${StructuredFloat32Array.inferMemberType(value)},`;
           }
         }, "")}
     }`;
