@@ -15,11 +15,15 @@ class Computer {
     this.items.delete(computable);
   }
 
-  public run(computable: ComputableInterface): void {
+  public run(computable: ComputableInterface | ComputableInterface[]): void {
     const commandEncoder = this.device.createCommandEncoder();
     const computePass = commandEncoder.beginComputePass();
 
-    computable.getCommands(computePass);
+    if (Array.isArray(computable)) {
+      computable.forEach((item) => item.getCommands(computePass));
+    } else {
+      computable.getCommands(computePass);
+    }
 
     computePass.end();
     const commands = commandEncoder.finish();
