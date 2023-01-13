@@ -22,7 +22,7 @@
 <ul class="tsd-hierarchy">
 <li><span class="target">StructuredFloat32Array</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/isjackwild/webgpu-tooling/blob/29100cc/src/core/StructuredFloat32Array.ts#L6">src/core/StructuredFloat32Array.ts:6</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/isjackwild/webgpu-tooling/blob/61d4b4b/src/core/StructuredFloat32Array.ts#L12">src/core/StructuredFloat32Array.ts:12</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -87,22 +87,19 @@
 <section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class"><a id="constructor" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>constructor</span><a href="#constructor" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-<li class="tsd-signature tsd-anchor-link" id="constructor.new_StructuredFloat32Array">new <wbr/>Structured<wbr/>Float32<wbr/>Array<span class="tsd-signature-symbol">(</span>structure<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>[key: <span class="tsd-signature-type">string</span>]<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TStructuredFloat32ArrayAcceptedTypes</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">TStructuredFloat32ArrayAcceptedTypes</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span>, count<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="StructuredFloat32Array.html" class="tsd-signature-type" data-tsd-kind="Class">StructuredFloat32Array</a><a href="#constructor.new_StructuredFloat32Array" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="constructor.new_StructuredFloat32Array">new <wbr/>Structured<wbr/>Float32<wbr/>Array<span class="tsd-signature-symbol">(</span>_structure<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TStructuredFloat32ArrayStructure</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>index<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">TStructuredFloat32ArrayStructure</span><span class="tsd-signature-symbol">)</span>, count<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="StructuredFloat32Array.html" class="tsd-signature-type" data-tsd-kind="Class">StructuredFloat32Array</a><a href="#constructor.new_StructuredFloat32Array" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5>structure: <span class="tsd-signature-symbol">{ </span><br/><span>    </span>[key: <span class="tsd-signature-type">string</span>]<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TStructuredFloat32ArrayAcceptedTypes</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">TStructuredFloat32ArrayAcceptedTypes</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></h5>
-<ul class="tsd-parameters">
-<li class="tsd-parameter-index-signature">
-<h5><span class="tsd-signature-symbol">[</span>key: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">TStructuredFloat32ArrayAcceptedTypes</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">TStructuredFloat32ArrayAcceptedTypes</span><span class="tsd-signature-symbol">)</span></h5></li></ul></li>
+<h5>_structure: <span class="tsd-signature-type">TStructuredFloat32ArrayStructure</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>index<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">TStructuredFloat32ArrayStructure</span><span class="tsd-signature-symbol">)</span></h5></li>
 <li>
 <h5>count: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 1</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="StructuredFloat32Array.html" class="tsd-signature-type" data-tsd-kind="Class">StructuredFloat32Array</a></h4><aside class="tsd-sources">
 <p>Overrides Float32Array.constructor</p>
 <ul>
-<li>Defined in <a href="https://github.com/isjackwild/webgpu-tooling/blob/29100cc/src/core/StructuredFloat32Array.ts#L47">src/core/StructuredFloat32Array.ts:47</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/isjackwild/webgpu-tooling/blob/61d4b4b/src/core/StructuredFloat32Array.ts#L52">src/core/StructuredFloat32Array.ts:52</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="BYTES_PER_ELEMENT" class="tsd-anchor"></a>
@@ -147,7 +144,7 @@
 <h3 class="tsd-anchor-link"><span>count</span><a href="#count" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">count<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 1</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/isjackwild/webgpu-tooling/blob/29100cc/src/core/StructuredFloat32Array.ts#L53">src/core/StructuredFloat32Array.ts:53</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/isjackwild/webgpu-tooling/blob/61d4b4b/src/core/StructuredFloat32Array.ts#L56">src/core/StructuredFloat32Array.ts:56</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="length" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagReadonly">Readonly</code> <span>length</span><a href="#length" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">length<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
@@ -172,12 +169,12 @@
 <li class="tsd-parameter">
 <h5>length<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5></li></ul></li></ul></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/isjackwild/webgpu-tooling/blob/29100cc/src/core/StructuredFloat32Array.ts#L7">src/core/StructuredFloat32Array.ts:7</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/isjackwild/webgpu-tooling/blob/61d4b4b/src/core/StructuredFloat32Array.ts#L13">src/core/StructuredFloat32Array.ts:13</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private"><a id="stride" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>stride</span><a href="#stride" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">stride<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/isjackwild/webgpu-tooling/blob/29100cc/src/core/StructuredFloat32Array.ts#L10">src/core/StructuredFloat32Array.ts:10</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/isjackwild/webgpu-tooling/blob/61d4b4b/src/core/StructuredFloat32Array.ts#L16">src/core/StructuredFloat32Array.ts:16</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="BYTES_PER_ELEMENT-1" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span>BYTES_<wbr/>PER_<wbr/>ELEMENT</span><a href="#BYTES_PER_ELEMENT-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">BYTES_<wbr/>PER_<wbr/>ELEMENT<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
@@ -497,7 +494,7 @@ If thisArg is omitted, undefined is used as the this value.</p>
 <h5>arrayIndex: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/isjackwild/webgpu-tooling/blob/29100cc/src/core/StructuredFloat32Array.ts#L115">src/core/StructuredFloat32Array.ts:115</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/isjackwild/webgpu-tooling/blob/61d4b4b/src/core/StructuredFloat32Array.ts#L122">src/core/StructuredFloat32Array.ts:122</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getWgslChunk" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Wgsl<wbr/>Chunk</span><a href="#getWgslChunk" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -510,7 +507,7 @@ If thisArg is omitted, undefined is used as the this value.</p>
 <h5>name: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;MyStruct&quot;</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/isjackwild/webgpu-tooling/blob/29100cc/src/core/StructuredFloat32Array.ts#L141">src/core/StructuredFloat32Array.ts:141</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/isjackwild/webgpu-tooling/blob/61d4b4b/src/core/StructuredFloat32Array.ts#L148">src/core/StructuredFloat32Array.ts:148</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="includes" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>includes</span><a href="#includes" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -926,7 +923,7 @@ instead of an array value.</p>
 <h5>arrayIndex: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/isjackwild/webgpu-tooling/blob/29100cc/src/core/StructuredFloat32Array.ts#L124">src/core/StructuredFloat32Array.ts:124</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/isjackwild/webgpu-tooling/blob/61d4b4b/src/core/StructuredFloat32Array.ts#L131">src/core/StructuredFloat32Array.ts:131</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="slice" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>slice</span><a href="#slice" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -1105,7 +1102,7 @@ at begin, inclusive, up to end, exclusive.</p>
 <h5>nextItemValue: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/isjackwild/webgpu-tooling/blob/29100cc/src/core/StructuredFloat32Array.ts#L12">src/core/StructuredFloat32Array.ts:12</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/isjackwild/webgpu-tooling/blob/61d4b4b/src/core/StructuredFloat32Array.ts#L18">src/core/StructuredFloat32Array.ts:18</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="from" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>from</span><a href="#from" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
