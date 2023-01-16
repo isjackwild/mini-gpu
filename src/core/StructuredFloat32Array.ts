@@ -132,7 +132,8 @@ class StructuredFloat32Array extends Float32Array {
           arrayData.push(value);
         }
 
-        let nextValue = entries[iE + 1] ? entries[iE + 1][1] : null;
+        // let nextValue = entries[iE + 1] ? entries[iE + 1][1] : null;
+        let nextValue = entries[iE + 1] ? entries[iE + 1][1] : entries[0][1];
 
         if (nextValue) {
           nextValue = nextValue instanceof Function ? nextValue() : nextValue;

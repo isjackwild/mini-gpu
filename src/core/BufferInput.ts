@@ -98,9 +98,7 @@ class BufferInput implements ProgramInputInterface {
         ${
           item instanceof StructuredFloat32Array
             ? item.getWgslChunk(
-                `MyStruct_${index}${
-                  name.charAt(0).toUpperCase() + name.slice(1)
-                }`
+                `Buffer${index}${name.charAt(0).toUpperCase() + name.slice(1)}`
               )
             : ``
         }
@@ -112,7 +110,7 @@ class BufferInput implements ProgramInputInterface {
       }, ``);
     } else {
       if (this.data instanceof StructuredFloat32Array) {
-        const structName = `MyStruct${
+        const structName = `Buffer${
           name.charAt(0).toUpperCase() + name.slice(1)
         }`;
         return `
