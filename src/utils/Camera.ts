@@ -16,16 +16,27 @@ class Camera {
     near,
     far,
     position,
+    target = [0, 0, 0],
+    up = [0, 1, 0],
   }: {
     aspectRatio: number;
     fov: number;
     near: number;
     far: number;
     position: [number, number, number];
+    target?: [number, number, number];
+    up?: [number, number, number];
   }) {
-    const transformationMatrix = mat4.fromTranslation(
+    // const transformationMatrix = mat4.fromTranslation(
+    //   mat4.create(),
+    //   vec3.fromValues(...position)
+    // ) as Float32Array;
+
+    const transformationMatrix = mat4.lookAt(
       mat4.create(),
-      vec3.fromValues(...position)
+      position,
+      target,
+      up
     ) as Float32Array;
     const projectionMatrix = mat4.identity(mat4.create()) as Float32Array;
     const viewProjectionMatrix = mat4.identity(mat4.create()) as Float32Array;
