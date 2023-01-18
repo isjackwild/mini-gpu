@@ -17,7 +17,7 @@ class Geometry {
   constructor(
     renderer: Renderer,
     { indices, normal, position, texcoord }: TGeometryArgs,
-    private _instanceCount = 1
+    public instanceCount = 1
   ) {
     this._vertexCount = indices?.length;
 
@@ -56,10 +56,6 @@ class Geometry {
 
   public get vertexCount(): number {
     return this._vertexCount;
-  }
-
-  public get instanceCount(): number {
-    return this._instanceCount;
   }
 
   public getVertexState(shaderModule: GPUShaderModule): GPUVertexState {

@@ -10,7 +10,7 @@ class ComputeProgram extends Program implements ComputableInterface {
     private device: GPUDevice,
     public shader: string,
     protected _inputs: { [key: string]: ProgramInputInterface },
-    private count: number,
+    public count: number,
     private workgroupSize: number
   ) {
     super();
