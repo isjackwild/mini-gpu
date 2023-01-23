@@ -14,6 +14,20 @@ abstract class Program {
     return this._inputs;
   }
 
+  public set inputs(newInputs: { [key: string]: ProgramInputInterface }) {
+    this._inputs = newInputs;
+    this.inputsKeys = Object.keys(this.inputs);
+  }
+
+  public getInput(key: string): ProgramInputInterface {
+    return this.inputs[key];
+  }
+
+  public setInput(key: string, input: ProgramInputInterface) {
+    this._inputs[key] = input;
+    this.inputsKeys = Object.keys(this.inputs);
+  }
+
   public getBindGroupLayouts(): GPUBindGroupLayout[] {
     return this.inputsKeys.map((key) => this.inputs[key].bindGroupLayout);
   }
