@@ -52,6 +52,7 @@ class RenderProgram extends Program implements RenderableInterface {
         renderer.sampleCount === 4
           ? {
               count: renderer.sampleCount,
+              alphaToCoverageEnabled: true,
             }
           : undefined,
     });
