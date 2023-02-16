@@ -2,7 +2,7 @@ class TextureLoader {
   constructor(private device: GPUDevice) {}
 
   public createTextureFromImageBitmapOrCanvas(
-    src: ImageBitmap | HTMLCanvasElement | ImageBitmap[]
+    src: ImageBitmap | HTMLCanvasElement | OffscreenCanvas | ImageBitmap[]
   ): GPUTexture {
     const isCubemap = Array.isArray(src);
 
