@@ -23,7 +23,6 @@ class Renderer {
     this.canvas.height = this.presentationSize.height;
     this.ctx = this.canvas.getContext("webgpu") as GPUCanvasContext;
     this.presentationFormat = navigator.gpu.getPreferredCanvasFormat();
-    console.log(this.presentationFormat);
 
     this.ctx.configure({
       device: this.device,
@@ -75,6 +74,10 @@ class Renderer {
       return this.renderTexture.height;
     }
     return this.presentationSize.height;
+  }
+
+  public get aspectRatio(): number {
+    return this.width / this.height;
   }
 
   public get pixelRatio(): number {
