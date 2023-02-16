@@ -11,11 +11,15 @@ class Renderer {
   private _pixelRatio = window.devicePixelRatio;
   private presentationSize = { width: 0, height: 0 };
   private _renderTexture?: GPUTexture;
+  private antialiasRenderTexture?: GPUTexture;
+  private depthTexture?: GPUTexture;
+  private _sampleCount: 1 | 4 = 1;
 
   constructor(
     public device: GPUDevice,
     private canvas: HTMLCanvasElement,
-    options: { alphaMode?: GPUCanvasAlphaMode } = {}
+    contextConfig: { alphaMode?: GPUCanvasAlphaMode } = {},
+    options: { antialias?: boolean } = {}
   ) {
     this.presentationSize.width = this.canvas.clientWidth * this.pixelRatio;
     this.presentationSize.height = this.canvas.clientHeight * this.pixelRatio;
@@ -23,36 +27,48 @@ class Renderer {
     this.canvas.height = this.presentationSize.height;
     this.ctx = this.canvas.getContext("webgpu") as GPUCanvasContext;
     this.presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+    this._sampleCount = options.antialias ? 4 : 1;
 
     this.ctx.configure({
       device: this.device,
       format: this.presentationFormat,
       usage: GPUTextureUsage.RENDER_ATTACHMENT,
       alphaMode: "premultiplied",
-      ...options,
+      ...contextConfig,
     });
 
-    const depthTexture = device.createTexture({
+    if (options.antialias) {
+      this.antialiasRenderTexture = device.createTexture({
+        size: [canvas.width, canvas.height],
+        format: this.presentationFormat,
+        sampleCount: this.sampleCount,
+        usage: GPUTextureUsage.RENDER_ATTACHMENT,
+      });
+    }
+
+    this.depthTexture = device.createTexture({
       size: {
         width: this.width,
         height: this.height,
         depthOrArrayLayers: 1,
       },
       format: this.depthFormat,
+      sampleCount: this.sampleCount,
       usage: GPUTextureUsage.RENDER_ATTACHMENT,
     });
 
     this.renderPassDescriptor = {
       colorAttachments: [
         {
-          view: this.ctx.getCurrentTexture().createView(),
+          view: this.colourAttachmentView,
+          resolveTarget: this.colourAttachmentResolveTarget,
           clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 0.0 },
           loadOp: "clear",
           storeOp: "store",
         },
       ],
       depthStencilAttachment: {
-        view: depthTexture.createView(),
+        view: this.depthTexture.createView(),
         depthClearValue: 1.0,
         depthLoadOp: "clear",
         depthStoreOp: "store",
@@ -89,28 +105,40 @@ class Renderer {
     this.resize();
   }
 
+  public get sampleCount(): 1 | 4 {
+    return this._sampleCount;
+  }
+
   public set renderTexture(texture: GPUTexture | null) {
     const lastWidth = this.width;
     const lastHeight = this.height;
+    this._renderTexture?.destroy();
     this._renderTexture = texture;
 
     if (texture) {
-      this.renderPassDescriptor.colorAttachments[0].view =
-        this.renderTexture.createView();
+      if (!!this.antialiasRenderTexture) {
+        this.renderPassDescriptor.colorAttachments[0].resolveTarget =
+          this.renderTexture.createView();
+      } else {
+        this.renderPassDescriptor.colorAttachments[0].view =
+          this.renderTexture.createView();
+      }
     }
 
     if (this.width !== lastWidth || this.height !== lastHeight) {
-      const depthTexture = this.device.createTexture({
+      this.depthTexture?.destroy();
+      this.depthTexture = this.device.createTexture({
         size: {
           width: this.width,
           height: this.height,
           depthOrArrayLayers: 1,
         },
+        sampleCount: this.sampleCount,
         format: this.depthFormat,
         usage: GPUTextureUsage.RENDER_ATTACHMENT,
       });
       this.renderPassDescriptor.depthStencilAttachment.view =
-        depthTexture.createView();
+        this.depthTexture.createView();
     }
   }
 
@@ -132,20 +160,38 @@ class Renderer {
     this.canvas.width = this.presentationSize.width;
     this.canvas.height = this.presentationSize.height;
 
-    const depthTexture = this.device.createTexture({
+    this.depthTexture?.destroy();
+    this.depthTexture = this.device.createTexture({
       size: {
         width: this.width,
         height: this.height,
         depthOrArrayLayers: 1,
       },
       format: this.depthFormat,
+      sampleCount: this.sampleCount,
       usage: GPUTextureUsage.RENDER_ATTACHMENT,
     });
     this.renderPassDescriptor.depthStencilAttachment.view =
-      depthTexture.createView();
-    this.renderPassDescriptor.colorAttachments[0].view = this.ctx
-      .getCurrentTexture()
-      .createView();
+      this.depthTexture.createView();
+
+    if (!!this.antialiasRenderTexture) {
+      this.antialiasRenderTexture = this.device.createTexture({
+        size: [width, height],
+        format: this.presentationFormat,
+        sampleCount: this.sampleCount,
+        usage: GPUTextureUsage.RENDER_ATTACHMENT,
+      });
+
+      this.renderPassDescriptor.colorAttachments[0].view =
+        this.antialiasRenderTexture.createView();
+      this.renderPassDescriptor.colorAttachments[0].resolveTarget = this.ctx
+        .getCurrentTexture()
+        .createView();
+    } else {
+      this.renderPassDescriptor.colorAttachments[0].view = this.ctx
+        .getCurrentTexture()
+        .createView();
+    }
   }
 
   public add(renderable: RenderableInterface): void {
@@ -156,14 +202,35 @@ class Renderer {
     this.items.delete(renderable);
   }
 
+  private get colourAttachmentView(): GPUTextureView {
+    if (this.antialiasRenderTexture) {
+      return this.antialiasRenderTexture.createView();
+    } else {
+      return this.ctx.getCurrentTexture().createView();
+    }
+  }
+
+  private get colourAttachmentResolveTarget(): GPUTextureView | undefined {
+    if (this.antialiasRenderTexture) {
+      return this.ctx.getCurrentTexture().createView();
+    } else {
+      return;
+    }
+  }
+
+  private setColourAttachment() {
+    if (!this.renderTexture) {
+      this.renderPassDescriptor.colorAttachments[0].view =
+        this.colourAttachmentView;
+      this.renderPassDescriptor.colorAttachments[0].resolveTarget =
+        this.colourAttachmentResolveTarget;
+    }
+  }
+
   public render(
     renderables: RenderableInterface | RenderableInterface[]
   ): void {
-    if (!this.renderTexture) {
-      this.renderPassDescriptor.colorAttachments[0].view = this.ctx
-        .getCurrentTexture()
-        .createView();
-    }
+    this.setColourAttachment();
 
     const commandEncoder = this.device.createCommandEncoder();
     const renderPass = commandEncoder.beginRenderPass(
@@ -182,11 +249,7 @@ class Renderer {
   }
 
   public renderAll() {
-    if (!this.renderTexture) {
-      this.renderPassDescriptor.colorAttachments[0].view = this.ctx
-        .getCurrentTexture()
-        .createView();
-    }
+    this.setColourAttachment();
 
     const commandEncoder = this.device.createCommandEncoder();
     const renderPass = commandEncoder.beginRenderPass(

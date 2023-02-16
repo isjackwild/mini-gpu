@@ -48,6 +48,12 @@ class RenderProgram extends Program implements RenderableInterface {
         depthWriteEnabled: options.depthWrite,
         depthCompare: options.depthCompare,
       },
+      multisample:
+        renderer.sampleCount === 4
+          ? {
+              count: renderer.sampleCount,
+            }
+          : undefined,
     });
   }
 
