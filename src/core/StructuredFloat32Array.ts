@@ -19,7 +19,7 @@ class StructuredFloat32Array extends Float32Array {
   private metadata: {
     [key: string]: TStructuredFloat32ArrayMemberMeta;
   } = {};
-  private stride = 0;
+  private _stride = 0;
 
   private static calculatePadding(
     arrayLength: number,
@@ -120,11 +120,13 @@ class StructuredFloat32Array extends Float32Array {
         value = value instanceof Function ? value() : value;
         value = value instanceof Float32Array ? Array.from(value) : value;
 
-        metadata[key] = {
-          index: arrayIndex,
-          length: Array.isArray(value) ? value.length : 1,
-          isArray: Array.isArray(value),
-        };
+        if (i === 0) {
+          metadata[key] = {
+            index: arrayIndex,
+            length: Array.isArray(value) ? value.length : 1,
+            isArray: Array.isArray(value),
+          };
+        }
 
         if (Array.isArray(value)) {
           arrayData.push(...value);
@@ -159,7 +161,11 @@ class StructuredFloat32Array extends Float32Array {
 
     super(arrayData);
     this.metadata = metadata;
-    this.stride = stride;
+    this._stride = stride;
+  }
+
+  public get stride(): number {
+    return this._stride;
   }
 
   public getValueAt(key: string, arrayIndex = 0) {
