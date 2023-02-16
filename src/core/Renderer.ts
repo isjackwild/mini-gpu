@@ -115,16 +115,7 @@ class Renderer {
     this._renderTexture?.destroy();
     this._renderTexture = texture;
 
-    if (texture) {
-      if (!!this.antialiasRenderTexture) {
-        this.renderPassDescriptor.colorAttachments[0].resolveTarget =
-          this.renderTexture.createView();
-      } else {
-        this.renderPassDescriptor.colorAttachments[0].view =
-          this.renderTexture.createView();
-      }
-    }
-
+    this.setColourAttachment();
     if (this.width !== lastWidth || this.height !== lastHeight) {
       this.depthTexture?.destroy();
       this.depthTexture = this.device.createTexture({
@@ -181,16 +172,6 @@ class Renderer {
         sampleCount: this.sampleCount,
         usage: GPUTextureUsage.RENDER_ATTACHMENT,
       });
-
-      this.renderPassDescriptor.colorAttachments[0].view =
-        this.antialiasRenderTexture.createView();
-      this.renderPassDescriptor.colorAttachments[0].resolveTarget = this.ctx
-        .getCurrentTexture()
-        .createView();
-    } else {
-      this.renderPassDescriptor.colorAttachments[0].view = this.ctx
-        .getCurrentTexture()
-        .createView();
     }
   }
 
@@ -205,26 +186,28 @@ class Renderer {
   private get colourAttachmentView(): GPUTextureView {
     if (this.antialiasRenderTexture) {
       return this.antialiasRenderTexture.createView();
-    } else {
-      return this.ctx.getCurrentTexture().createView();
     }
+    if (this.renderTexture) {
+      return this.renderTexture.createView();
+    }
+    return this.ctx.getCurrentTexture().createView();
   }
 
   private get colourAttachmentResolveTarget(): GPUTextureView | undefined {
-    if (this.antialiasRenderTexture) {
-      return this.ctx.getCurrentTexture().createView();
-    } else {
+    if (!this.antialiasRenderTexture) {
       return;
     }
+    if (this.renderTexture) {
+      return this.renderTexture.createView();
+    }
+    return this.ctx.getCurrentTexture().createView();
   }
 
   private setColourAttachment() {
-    if (!this.renderTexture) {
-      this.renderPassDescriptor.colorAttachments[0].view =
-        this.colourAttachmentView;
-      this.renderPassDescriptor.colorAttachments[0].resolveTarget =
-        this.colourAttachmentResolveTarget;
-    }
+    this.renderPassDescriptor.colorAttachments[0].view =
+      this.colourAttachmentView;
+    this.renderPassDescriptor.colorAttachments[0].resolveTarget =
+      this.colourAttachmentResolveTarget;
   }
 
   public render(
