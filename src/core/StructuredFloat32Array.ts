@@ -170,9 +170,13 @@ class StructuredFloat32Array extends Float32Array {
 
   public getValueAt(key: string, arrayIndex = 0) {
     const { index, length } = this.metadata[key];
-
     if (length > 1) {
-      return Array.from(this.slice(index + arrayIndex * this.stride, length));
+      return Array.from(
+        new Float32Array(this.buffer).slice(
+          index + arrayIndex * this.stride,
+          index + arrayIndex * this.stride + length
+        )
+      );
     }
     return this[index + arrayIndex * this.stride];
   }
