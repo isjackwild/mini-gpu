@@ -9,7 +9,7 @@ class UniformsInput implements ProgramInputInterface {
   private bufferMembers: { key: string; value: any }[] = [];
   private textures: { key: string; value: GPUTexture }[] = [];
 
-  private uniformsArray: StructuredFloat32Array;
+  private _uniformsArray: StructuredFloat32Array;
   private uniformsBuffer: GPUBuffer;
   private bufferNeedsUpdate = true;
   private _bindGroup: GPUBindGroup;
@@ -49,14 +49,14 @@ class UniformsInput implements ProgramInputInterface {
       },
       {}
     );
-    this.uniformsArray = new StructuredFloat32Array(
+    this._uniformsArray = new StructuredFloat32Array(
       structuredArrayInitializer as any as {
         [key: string]: TStructuredFloat32ArrayAcceptedTypes;
       }
     );
 
     this.uniformsBuffer = this.device.createBuffer({
-      size: this.uniformsArray.byteLength,
+      size: this._uniformsArray.byteLength,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
     this.update();
@@ -139,7 +139,7 @@ class UniformsInput implements ProgramInputInterface {
     if (texture) {
       return texture.value;
     }
-    return this.uniformsArray.getValueAt(prop);
+    return this._uniformsArray.getValueAt(prop);
   }
 
   private proxySetHandler(target, prop, reciever) {
@@ -150,7 +150,7 @@ class UniformsInput implements ProgramInputInterface {
       item.value = reciever;
       this.createBindGroup();
     } else {
-      this.uniformsArray.setValueAt(prop, reciever);
+      this._uniformsArray.setValueAt(prop, reciever);
       this.bufferNeedsUpdate = true;
     }
 
@@ -159,6 +159,10 @@ class UniformsInput implements ProgramInputInterface {
     }
 
     return true;
+  }
+
+  public get uniformsArray(): StructuredFloat32Array {
+    return this._uniformsArray;
   }
 
   public get member(): any {
@@ -181,7 +185,7 @@ class UniformsInput implements ProgramInputInterface {
       name.charAt(0).toUpperCase() + name.slice(1)
     }`;
     return `
-    ${this.uniformsArray.getWgslChunk(structName)}
+    ${this._uniformsArray.getWgslChunk(structName)}
 
     @group(${groupIndex}) @binding(0) var<uniform> uniforms${
       name ? "_" : ""
@@ -191,7 +195,7 @@ class UniformsInput implements ProgramInputInterface {
 
   public update() {
     if (!this.bufferNeedsUpdate) return;
-    this.device.queue.writeBuffer(this.uniformsBuffer, 0, this.uniformsArray);
+    this.device.queue.writeBuffer(this.uniformsBuffer, 0, this._uniformsArray);
     this.bufferNeedsUpdate = false;
   }
 }
