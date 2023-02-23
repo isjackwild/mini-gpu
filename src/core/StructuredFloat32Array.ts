@@ -184,7 +184,8 @@ class StructuredFloat32Array extends Float32Array {
   public setValueAt(
     key: string,
     value: TStructuredFloat32ArrayAcceptedTypes,
-    arrayIndex = 0
+    arrayIndex = 0,
+    offset = 0
   ): void {
     const { index } = this.metadata[key];
 
@@ -192,9 +193,9 @@ class StructuredFloat32Array extends Float32Array {
       value = Array.from(value);
     }
     if (Array.isArray(value)) {
-      this.set(value, index + arrayIndex * this.stride);
+      this.set(value, index + offset + arrayIndex * this.stride);
     } else {
-      this.set([value], index + arrayIndex * this.stride);
+      this.set([value], index + offset + arrayIndex * this.stride);
     }
   }
 
