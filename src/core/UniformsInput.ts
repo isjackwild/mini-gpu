@@ -112,6 +112,8 @@ class UniformsInput implements ProgramInputInterface {
         },
       });
     }
+
+    // TODO: only create a single sampler for each texture
     this.textures.forEach(({ value }) => {
       entries.push({
         binding: entries.length,
@@ -190,6 +192,17 @@ class UniformsInput implements ProgramInputInterface {
     @group(${groupIndex}) @binding(0) var<uniform> uniforms${
       name ? "_" : ""
     }${name} : ${structName};
+
+    ${this.textures
+      .map(
+        (_texture, i) => `
+      @group(${groupIndex}) @binding(${i * 2 + 1}) var sampler_2d_${i}: sampler;
+      @group(${groupIndex}) @binding(${
+          i * 2 + 2
+        }) var texture_${i}: texture_2d<f32>;
+    `
+      )
+      .join("\n")}
     `;
   }
 
