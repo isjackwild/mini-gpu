@@ -18,8 +18,6 @@ It certainly doesn't (and doesn't aim to) do it all, and if you're after somethi
 
 # Usage
 
-_when I get round to publishing it..._
-
 Install the library by running
 
 ```
