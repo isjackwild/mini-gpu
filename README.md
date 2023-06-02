@@ -59,11 +59,38 @@ _Bare in mind that this is still WIP_, so the output might need some tweaking (t
 
 ## Camera
 
-TODO
+Sets up matrices required for a simple perspective camera, which can be passed into a program as uniforms:
+
+```
+const camera = new Camera({
+  fov: DEG_TO_RAD * 50,
+  aspectRatio: renderer.width / renderer.height,
+  near: 0.01,
+  far: 999,
+  position: [0, 0, -5],
+});
+
+const uniforms = new UniformsInput(device as GPUDevice, {
+  u_view_projection_matrix: camera.viewProjectionMatrix,
+});
+```
+
+You can then update properties such as `aspectRatio`, `fov`, `near`, `far`, `position`, `target` and `up` and the matrices will be updated. You will then need to update the uniforms: `uniforms.member.u_view_projection_matrix = camera.viewProjectionMatrix;`
 
 ## Camera Orbit Controls
 
-TODO
+Creates orbit controls for a passed camera:
+
+```
+const controls = new OrbitControls(camera, canvas);
+```
+
+You need to update the controls on each frame, and then update the uniforms with the new viewProjecttionMatrix of the camera:
+
+```
+controls.update();
+uniforms.member.u_view_projection_matrix = camera.viewProjectionMatrix;
+```
 
 ## Texture Loader
 
@@ -71,7 +98,49 @@ TODO
 
 ## Structured Array
 
-TODO
+This class helps to created padded, structured array data which can be used as data for a `BufferInput` or `PingPongBufferInput`, and is also used internally when creating `UniformsInput`.
+
+It takes a Javascript object (or a function which returns an object) and the number of array elements you require (it defaults to a single element), and creates a magically padded Float32Array. It also allows you to get and set struct members by their name and array index.
+
+For example:
+
+```
+const particleCount = 1000;
+
+// Pass an object in the constructor
+const data = new StructuredFloat32Array(
+  {
+    position: [0, 0, 0],
+    velocity: [0, 0, 0],
+    randomSeed: () => Math.random(), // you can also use a function which returns an array or float
+  },
+  particleCount
+);
+
+// OR
+
+// Pass a function which returns an object in the constructor
+const data = new StructuredFloat32Array(
+  (index) => ({
+    position: [index, index, index],
+    velocity: [0, 0, 0],
+    randomSeed: () => Math.random(), // you can also use a function which returns an array or float
+  }),
+  particleCount
+);
+
+const simulation = new PingPongBufferInput(device, data);
+```
+
+You can then access and update members by name and array index, for example:
+
+```
+// gets the position of particle at index 10
+const particlePosition = data.getValueAt('position', 10);
+
+// sets the position of particle at index 20
+data.setValueAt('position', [1,2,3], 20)
+```
 
 # Class reference
 

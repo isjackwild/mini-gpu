@@ -254,13 +254,10 @@ class OrbitControls {
     const { x, y, z } = this.spherical.toCathesian();
     vec3.set(this.eye, x, y, z);
     vec3.add(this.eye, this.eye, this.target);
-    mat4.lookAt(
-      this.camera.transformationMatrix,
-      this.eye,
-      this.target,
-      this.up
-    );
-    this.camera.updateMatrices();
+
+    this.camera.position = [this.eye[0], this.eye[1], this.eye[2]];
+    this.camera.target = [this.target[0], this.target[1], this.target[2]];
+    this.camera.up = [this.up[0], this.up[1], this.up[2]];
   }
 
   public destroy(): void {

@@ -5,10 +5,13 @@ class Camera {
   private _fov: number;
   private _near: number;
   private _far: number;
+  private _position: [number, number, number];
+  private _target: [number, number, number];
+  private _up: [number, number, number];
 
-  public transformationMatrix: Float32Array;
-  private projectionMatrix: Float32Array;
-  public viewProjectionMatrix: Float32Array;
+  public transformationMatrix = mat4.identity(mat4.create()) as Float32Array;
+  private projectionMatrix = mat4.identity(mat4.create()) as Float32Array;
+  public viewProjectionMatrix = mat4.identity(mat4.create()) as Float32Array;
 
   constructor({
     aspectRatio,
@@ -27,28 +30,13 @@ class Camera {
     target?: [number, number, number];
     up?: [number, number, number];
   }) {
-    // const transformationMatrix = mat4.fromTranslation(
-    //   mat4.create(),
-    //   vec3.fromValues(...position)
-    // ) as Float32Array;
-
-    const transformationMatrix = mat4.lookAt(
-      mat4.create(),
-      position,
-      target,
-      up
-    ) as Float32Array;
-    const projectionMatrix = mat4.identity(mat4.create()) as Float32Array;
-    const viewProjectionMatrix = mat4.identity(mat4.create()) as Float32Array;
-
     this._near = near;
     this._far = far;
     this._aspectRatio = aspectRatio;
     this._fov = fov;
-
-    this.transformationMatrix = transformationMatrix;
-    this.projectionMatrix = projectionMatrix;
-    this.viewProjectionMatrix = viewProjectionMatrix;
+    this._position = position;
+    this._target = target;
+    this._up = up;
 
     this.updateMatrices();
   }
@@ -90,21 +78,40 @@ class Camera {
   }
 
   public set position(position: [number, number, number]) {
-    this.transformationMatrix[12] = position[0];
-    this.transformationMatrix[13] = position[1];
-    this.transformationMatrix[14] = position[2];
+    this._position = position;
     this.updateMatrices();
   }
 
   public get position(): [number, number, number] {
-    return [
-      this.transformationMatrix[12],
-      this.transformationMatrix[13],
-      this.transformationMatrix[14],
-    ];
+    return this._position;
+  }
+
+  public set target(target: [number, number, number]) {
+    this._target = target;
+    this.updateMatrices();
+  }
+
+  public get target(): [number, number, number] {
+    return this._target;
+  }
+
+  public get up(): [number, number, number] {
+    return this._up;
+  }
+
+  public set up(up: [number, number, number]) {
+    this._up = up;
+    this.updateMatrices();
   }
 
   public updateMatrices() {
+    mat4.lookAt(
+      this.transformationMatrix,
+      this.position,
+      this.target,
+      this.up
+    ) as Float32Array;
+
     mat4.perspective(
       this.projectionMatrix,
       this.fov,
