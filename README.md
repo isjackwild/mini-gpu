@@ -94,7 +94,20 @@ uniforms.member.u_view_projection_matrix = camera.viewProjectionMatrix;
 
 ## Texture Loader
 
-TODO
+Allows you to load and create a WebGPU texture from a number of different sources.
+
+```
+// create the loader
+const loader = new TextureLoader(device);
+
+// create a texture from a canvas (or ImageBitmap)
+const texture = loader.createTextureFromImageBitmapOrCanvas(myCanvasOrOffscreenCanvasOrImageBitmap);
+
+// create a texture from a URL
+const texture = async loader.loadTextureFromImageSrc('my/image.png');
+```
+
+You can also pass in an array of six elements to each method to create a cube texture.
 
 ## Structured Array
 
