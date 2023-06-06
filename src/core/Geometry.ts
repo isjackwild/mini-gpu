@@ -16,9 +16,10 @@ class Geometry {
 
   constructor(
     renderer: Renderer,
-    { indices, normal, position, texcoord }: TGeometryArgs,
+    args: TGeometryArgs,
     public instanceCount = 1
   ) {
+    const { indices, normal, position, texcoord } = args;
     this._vertexCount = indices?.length;
 
     this.positionBuffer = renderer.device.createBuffer({
