@@ -9,7 +9,7 @@ export type TStructuredFloat32ArrayStructure = {
     | (() => TStructuredFloat32ArrayAcceptedTypes);
 };
 
-type TStructuredFloat32ArrayMemberMeta = {
+export type TStructuredFloat32ArrayMemberMeta = {
   index: number;
   length: number;
   isArray: boolean;

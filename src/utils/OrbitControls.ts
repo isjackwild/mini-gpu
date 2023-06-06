@@ -1,7 +1,7 @@
 import { mat4, vec2, vec3 } from "gl-matrix";
 import Camera from "./Camera";
 
-type TOptions = {
+export type TOptions = {
   target?: vec3;
   up?: vec3;
   autoRotate?: boolean;
@@ -11,19 +11,19 @@ type TOptions = {
   enableDolly?: boolean;
 };
 
-type TSpherical = {
+export type TSpherical = {
   rho: number;
   phi: number;
   theta: number;
 };
 
-type TVec3 = {
+export type TVec3 = {
   x: number;
   y: number;
   z: number;
 };
 
-class Spherical {
+export class Spherical {
   public static sphericalToCathesian({ rho, phi, theta }: TSpherical): TVec3 {
     var sinPhiRho = Math.sin(phi) * rho;
 

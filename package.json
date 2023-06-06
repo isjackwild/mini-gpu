@@ -25,7 +25,7 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc",
-    "docs": "typedoc  --plugin typedoc-plugin-missing-exports --out docs src/index.ts"
+    "docs": "typedoc --out docs src/index.ts"
   },
   "devDependencies": {
     "@types/node": "^18.11.9",
